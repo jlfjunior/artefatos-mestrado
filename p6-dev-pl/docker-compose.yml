@@ -1,0 +1,337 @@
+﻿version: '3.8'
+
+services:
+  # Banco de dados para identidade (auth)
+  mysql_identity:
+    image: mysql:8.0
+    container_name: mysql_identity
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysqldata_identity:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-net
+
+  otel-collector:
+     image: otel/opentelemetry-collector:latest
+     command: ["--config=/etc/otel-collector-config.yaml"]
+     volumes:
+      - ./otel/otel-collector-config.yaml:/etc/otel-collector-config.yaml
+     ports:
+      - "8888:8888"  # Health
+      - "4317:4317"  # OTLP gRPC
+      - "4318:4318"  # OTLP HTTP
+      - "9464:9464"  # Prometheus metrics
+     depends_on:
+      - prometheus
+     networks:
+      - app-net
+
+ 
+
+
+  # Exportador Prometheus para o mysql_identity
+  # mysqld_exporter_identity:
+  #   image: prom/mysqld-exporter:latest
+  #   container_name: mysqld_exporter_identity
+  #   restart: always
+  #   volumes:
+  #     - ./mysql-identity-my.cnf:/home/.my.cnf:ro
+  #   environment:
+  #     - MYSQLD_EXPORTER_CONFIG_MY_CNF=/home/.my.cnf
+  #   ports:
+  #     - "9105:9104"
+  #   depends_on:
+  #     - mysql_identity
+  #   networks:
+  #     - app-net
+
+  # MongoDB (opcional)
+  mongodb:
+    image: mongo:6.0
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --quiet --eval 'db.runCommand({ ping: 1 }).ok' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-net
+
+
+  # API principal do sistema
+  controlefluxocaixa.api:
+    build:
+      context: ./ControleFluxoCaixa.API
+      dockerfile: Dockerfile
+    image: controlefluxocaixa_api:latest
+    container_name: controlefluxocaixa_api
+    depends_on:
+      mysql_identity:
+        condition: service_healthy
+      mysql_fluxocaixa:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+      mongodb:
+         condition: service_healthy
+    restart: always
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: "http://+:80"
+
+      # Connection Strings
+      ConnectionStrings__IdentityConnection: "server=mysql_identity;port=3306;database=dbfluxocaixa_identity;user=root;password=root"
+      ConnectionStrings__FluxoCaixaConnection: "server=mysql_fluxocaixa;port=3306;database=dbfluxocaixa;user=root;password=root"
+
+       # MongoDB
+      Mongo__ConnectionString: "mongodb://mongodb:27017"
+      Mongo__DatabaseName: "ControleFluxoCaixa"
+      Mongo__CollectionName: "SaldoDiarioConsolidado"
+
+      # Configuração RabbitMQ
+      RabbitMqSettings__Inclusao__AmqpUri: amqp://guest:guest@rabbitmq:5672
+      RabbitMqSettings__Inclusao__ExchangeName: lancamento.exchange
+      RabbitMqSettings__Inclusao__QueueName: lancamento.inclusao.queue
+      RabbitMqSettings__Inclusao__RoutingKey: lancamento.inclusao
+      RabbitMqSettings__Inclusao__RetryQueueName: lancamento.inclusao.retry.queue
+      RabbitMqSettings__Inclusao__RetryRoutingKey: lancamento.inclusao.retry
+
+      RabbitMqSettings__Exclusao__AmqpUri: amqp://guest:guest@rabbitmq:5672
+      RabbitMqSettings__Exclusao__ExchangeName: lancamento.exchange
+      RabbitMqSettings__Exclusao__QueueName: lancamento.excluido.queue
+      RabbitMqSettings__Exclusao__RoutingKey: lancamento.excluido
+      RabbitMqSettings__Exclusao__RetryQueueName: lancamento.excluido.retry.queue
+      RabbitMqSettings__Exclusao__RetryRoutingKey: lancamento.excluido.retry
+
+      # Redis
+      Redis__Configuration: redis:6379
+      Redis__InstanceName: ControleFluxoCaixa_
+
+      # Loki
+      LOKI__Uri: http://loki:3100/loki/api/v1/push
+      LOKI__PeriodSeconds: 2
+      LOKI__BufferBaseFilename: /tmp/loki-buffer/buffer
+
+    ports:
+      - "5001:80"
+    networks:
+      - app-net
+
+  # Redis principal para cache
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - app-net
+
+  # Exportador Prometheus para o Redis
+  redis_exporter:
+    image: oliver006/redis_exporter:latest
+    container_name: redis-exporter
+    restart: always
+    command:
+      - --redis.addr=redis:6379
+      - --web.listen-address=:9121
+    ports:
+      - "9121:9121"
+    networks:
+      - app-net
+    depends_on:
+      - redis 
+
+  # Exportador Prometheus para MongoDB
+  mongo_exporter:
+    image: bitnami/mongodb-exporter:latest
+    container_name: mongo-exporter
+    restart: always
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017
+      - MONGODB_CONNECTION_TIMEOUT=5s
+    ports:
+      - "9216:9216"
+    networks:
+      - app-net
+    depends_on:
+      - mongodb
+
+  # Prometheus principal
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: always
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    ports:
+      - "9090:9090"
+    environment:
+      - TZ=America/Sao_Paulo
+    networks:
+      - app-net
+
+  # Grafana para dashboards
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: always
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      #GF_INSTALL_PLUGINS: grafana-tempo-datasource  # ← plugin
+    depends_on:
+      - prometheus
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./Grafana/Datasources:/etc/grafana/provisioning/datasources
+      - ./Grafana/Dashboards:/etc/grafana/provisioning/dashboards
+    networks:
+      - app-net
+
+  # RabbitMQ com interface de gerenciamento
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - app-net
+
+  # Init do Loki para permissões corretas
+  loki-init:
+    image: busybox:latest
+    container_name: loki-init
+    restart: "no"
+    command: >
+      sh -c "chown -R 10001:10001 /loki/index /loki/chunks /loki/compactor"
+    volumes:
+      - loki_index:/loki/index
+      - loki_chunks:/loki/chunks
+      - loki_compactor:/loki/compactor
+    networks:
+      - app-net
+
+  # Loki para logs estruturados
+  loki:
+    image: grafana/loki:2.8.2
+    container_name: loki
+    restart: always
+    depends_on:
+      - loki-init
+    ports:
+      - "3100:3100"
+    command:
+      - -config.file=/etc/loki/local-config.yaml
+      - -config.expand-env=true
+    volumes:
+      - ./loki-config.yaml:/etc/loki/local-config.yaml:ro
+      - loki_index:/loki/index
+      - loki_chunks:/loki/chunks
+      - loki_compactor:/loki/compactor
+    networks:
+      - app-net
+
+  # Promtail para coleta de logs locais para o Loki
+  promtail:
+    image: grafana/promtail:2.8.2
+    container_name: promtail
+    restart: always
+    volumes:
+      - /var/log:/var/log
+      - ./promtail-config.yaml:/etc/promtail/config.yaml:ro
+      - ./ControleFluxoCaixa.API/logs-fallback:/app/logs-fallback:ro
+    command:
+      - -config.file=/etc/promtail/config.yaml
+    networks:
+      - app-net
+
+  # Banco de dados para os dados principais do sistema
+  mysql_fluxocaixa:
+    image: mysql:8.0
+    container_name: mysql_fluxocaixa
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysqldata_fluxocaixa:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-net
+
+  gatware_bff:
+    build:
+      context: .
+      dockerfile: ControleFluxoCaixa.Gatware.BFF/Dockerfile
+    image: controlefluxocaixa_gatware_bff:latest
+    container_name: controlefluxocaixa_gatware_bff
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    ports:
+      - "32768:8080"  
+    depends_on:
+      - controlefluxocaixa.api
+    networks:
+      - app-net
+
+# Worker para processamento RabbitMQ com debug
+  worker:
+    build:
+      context: ./ControleFluxoCaixa.WorkerRabbitMq
+      dockerfile: Dockerfile
+    container_name: worker
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      Mongo__ConnectionString: mongodb://mongodb:27017
+      Mongo__DatabaseName: ControleFluxoCaixa
+      Rabbit__Host: rabbitmq
+      Rabbit__User: guest
+      Rabbit__Pass: guest
+    volumes:
+      - ./ControleFluxoCaixa.WorkerRabbitMq:/app
+      - ~/.nuget/packages:/root/.nuget/packages:ro
+    command: ["dotnet", "watch", "run"]
+    depends_on:
+      - mongodb
+      - rabbitmq
+    networks:
+      - app-net
+networks:
+  app-net:
+    driver: bridge
+
+volumes:
+  mysqldata_identity:
+  mongo-data:
+  loki_index:
+  loki_chunks:
+  loki_compactor:
+  mysqldata_fluxocaixa:

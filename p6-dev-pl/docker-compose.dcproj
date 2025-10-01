@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" Sdk="Microsoft.Docker.Sdk">
+  <PropertyGroup Label="Globals">
+    <ProjectVersion>2.1</ProjectVersion>
+    <DockerTargetOS>Linux</DockerTargetOS>
+    <DockerPublishLocally>False</DockerPublishLocally>
+    <ProjectGuid>81dded9d-158b-e303-5f62-77a2896d2a5a</ProjectGuid>
+    <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
+    <DockerServiceUrl>{Scheme}://localhost:{ServicePort}/swagger</DockerServiceUrl>
+    <DockerServiceName>controlefluxocaixa.api</DockerServiceName>
+    <DockerComposeProjectName>arquiteto-solucoes</DockerComposeProjectName>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="blackbox.yml" />
+    <None Include="docker-compose.override.yml">
+      <DependentUpon>docker-compose.yml</DependentUpon>
+    </None>
+    <None Include="docker-compose.yml" />
+    <None Include=".dockerignore" />
+    <None Include="dockerfile.prometheus" />
+    <None Include="Grafana\Dashboards\dashboards.yaml" />
+    <None Include="Grafana\Dashboards\Logs-Detalhados-Observabilidade.json" />
+    <None Include="Grafana\Datasources\datasources.yaml" />
+    <None Include="loki-config.yaml" />
+    <None Include="mysql_exporter_app.cnf" />
+    <None Include="otel\otel-collector-config.yaml" />
+    <None Include="prometheus.yml" />
+    <None Include="promtail-config.yaml" />
+  </ItemGroup>
+</Project>

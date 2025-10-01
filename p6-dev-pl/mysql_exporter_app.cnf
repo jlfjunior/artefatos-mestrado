@@ -1,0 +1,6 @@
+[client]
+# Conexão ao banco “fluxocaixa”
+user=root
+password=root
+host=mysql_fluxocaixa
+port=3306
