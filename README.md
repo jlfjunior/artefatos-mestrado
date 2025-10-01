@@ -5,3 +5,4 @@
 | P1 | Desenvolvedor de Software  | Pleno | Ap |
 | P2 | Arquiteto de Software | Especialista | Rep |
 | P3 | Arquiteto de Software | Especialista | Rep |
+| P4 | Arquiteto de Software | Especialista | Ap |

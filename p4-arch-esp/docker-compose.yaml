@@ -1,0 +1,107 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres
+    container_name: postgres
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: 123456
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - cashflow-net
+
+  redis:
+    image: redis
+    container_name: redis
+    command: redis-server --requirepass 123456
+    ports:
+      - "6379:6379"
+    networks:
+      - cashflow-net
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: 123456
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - cashflow-net
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: 123456
+    ports:
+      - "8080:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+    networks:
+      - cashflow-net
+
+  cash-flow-identifyserver-api:
+    build:
+      context: ./CashFlow.IdentifyServer.Api
+      dockerfile: Dockerfile
+    container_name: cash-flow-identifyserver-api
+    environment:
+      - ConnectionStrings__Default=Host=postgres;Port=5432;Database=identity-server;Username=admin;Password=123456
+    ports:
+      - "5001:8080"
+    depends_on:
+      - postgres
+    networks:
+      - cashflow-net
+
+  cash-flow-api:
+    build:
+      context: ./CashFlow.Api
+      dockerfile: Dockerfile
+    container_name: cash-flow-api
+    environment:
+      - ConnectionStrings__Default=Host=postgres;Port=5432;Database=cash-flow;Username=admin;Password=123456
+      - Redis__Connection=redis:6379,password=123456
+      - RabbitMQ__Connection=amqp://admin:123456@rabbitmq:5672
+    ports:
+      - "5002:8080"
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+    networks:
+      - cashflow-net
+
+  cash-flow-consumer-worker:
+    build:
+      context: ./CashFlow.Consumer.Worker
+      dockerfile: Dockerfile
+    container_name: cash-flow-consumer-worker
+    environment:
+      - ConnectionStrings__Default=Host=postgres;Port=5432;Database=cash-flow;Username=admin;Password=123456
+      - Redis__Connection=redis:6379,password=123456
+      - RabbitMQ__Connection=amqp://admin:123456@rabbitmq:5672
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+    networks:
+      - cashflow-net
+
+volumes:
+  postgres_data:
+  pgadmin_data:
+
+networks:
+  cashflow-net:
+    driver: bridge
