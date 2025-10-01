@@ -1,0 +1,49 @@
+networks:
+  platform-networks:
+    driver: bridge
+
+services:
+  consolidation-api:
+    build:
+      context: ./
+      dockerfile: src/Consolidation/Consolidation.Api/Dockerfile
+    ports:
+      - "8030:5000"
+    networks:
+      - platform-networks
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  transaction-api:
+    build:
+      context: ./
+      dockerfile: src/Transaction/Transaction.Api/Dockerfile
+    ports:
+      - "8031:5001"
+    networks:
+      - platform-networks
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"     # Porta para aplicações (RabbitMQ)
+      - "15672:15672"   # Painel de gerenciamento web
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo > /dev/tcp/localhost/5672"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - platform-networks

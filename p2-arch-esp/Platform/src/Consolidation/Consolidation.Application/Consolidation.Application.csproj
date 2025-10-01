@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Events\" />
+    <Folder Include="Templates\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Commons\Commons.Infra.RabbitMQ\Commons.Infra.RabbitMQ.csproj" />
+    <ProjectReference Include="..\Consolidation.Domain\Consolidation.Domain.csproj" />
+	<PackageReference Include="MediatR" Version="10.0.1" />
+  </ItemGroup>
+
+</Project>
