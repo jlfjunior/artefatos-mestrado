@@ -9,3 +9,6 @@
 | P5 | Desenvolvedor de Software  | Pleno | Ap |
 | P6 | Desenvolvedor de Software  | Pleno | Ap |
 | P7 | Arquiteto de Software | Senior | Ap |
+
+
+OBS: R500
