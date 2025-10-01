@@ -8,3 +8,4 @@
 | P4 | Arquiteto de Software | Especialista | Ap |
 | P5 | Desenvolvedor de Software  | Pleno | Ap |
 | P6 | Desenvolvedor de Software  | Pleno | Ap |
+| P7 | Arquiteto de Software | Senior | Ap |
