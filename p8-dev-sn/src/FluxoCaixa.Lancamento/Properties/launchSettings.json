@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "FluxoCaixa.Lancamento": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:60277;http://localhost:60280"
+    }
+  }
+}
