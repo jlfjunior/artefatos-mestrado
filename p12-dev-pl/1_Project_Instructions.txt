@@ -1,0 +1,37 @@
+Repositório do projeto
+https://github.com/jccardosors/ControleLancamentosRepo.git
+
+Passos para rodar o projeto
+1 – Execute o script de banco (arquivo 1_SQL_Script_DB.sql) que esta na raíz da solution;
+2 – Baixe o projeto no source https://github.com/jccardosors/ControleLancamentosRepo.git e utilize a branch _developer;
+3 – No projeto Project.Api abra o arquivo appsettings e na chave connectionstrings altere o data source com o data source do Sql Server;
+4 – Rode o projeto Project.Api e para autenticar use o usuário já criado no passo 1; 
+
+Ferramentas 
+- Visual studio comunity 2022;
+- Banco de dados SQL Server v18;
+
+Frameworks e práticas
+- Arquitetura Hexagonal; 
+- .NET Framework 8.0;
+- Web Api REST;
+- Swagger UI com documentação mínima;
+- Autenticação usando JWT;
+- FluentValidation para validar inputs de entrada dos endpoints.
+- Resposta customizada dos endpoints;
+- Mapper para parsear dados entre objetos;
+- Entity Framework para conectar com o database;
+- Injeção de dependência via construtor em controllers e classes de serviço;
+- Testes unitários usando xUnit;
+
+Estrutura do Projeto
+
+Para atender alguns requisitos do teste foi usado uma arquitetura clean como a Arquitetura Hexagonal, abaixo a estrutura da solução. 
+
+Project.Api: é o projeto de api propriamente dito, contém os serviços expostos para o mundo externo.
+Project.Application: é o projeto que centraliza as regras de negócio;
+Project.Domain: é o projeto que contém as entidades e repositories para trabalhar com o ORM Entity Framework.
+Project.Infra.Data: é o projeto responsável por configurar e mapear as entidades de banco, além de conter a classe DBcontext.
+Project.Infra.Ioc: projeto responsável por registrar as interfaces e suas classes de serviço permitindo a injeção de dependência via construtor em controllers e classes;
+Project.Tests: projeto responsável pelos testes unitários;
+
