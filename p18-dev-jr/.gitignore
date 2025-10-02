@@ -1,0 +1,64 @@
+# Arquivos gerados pelo Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Arquivos de build
+[Bb]uild/
+[Dd]ebug/
+[Rr]elease/
+bin/
+obj/
+[Dd]ebugPublic/
+[Dd]istrib/
+[Oo]ut/
+
+# Arquivos de cache
+*.cache
+.cache/
+**/project.lock.json
+**/project.fragment.lock.json
+**/*.cache
+**/.cache/
+
+# Arquivos temporários
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Logs
+*.log
+logs/
+**/*.log
+
+# Pacotes NuGet
+*.nupkg
+*.snupkg
+.nuget/
+
+# Pastas específicas do DDD
+src/**/bin/
+src/**/obj/
+src/**/logs/
+
+# Pastas específicas do seu projeto
+Boxflux.web/bin/
+Boxflux.web/obj/
+Boxflux.infra/bin/
+Boxflux.infra/obj/
+Boxflux.domain/bin/
+Boxflux.domain/obj/
+Boxflux.application/bin/
+Boxflux.application/obj/
+Boxflux.web/.cache/
+Boxflux.infra/.cache/
+Boxflux.domain/.cache/
+Boxflux.application/.cache/
+
+# Arquivos de configuração
+appsettings.Development.json
+appsettings.Staging.json
+appsettings.*.json

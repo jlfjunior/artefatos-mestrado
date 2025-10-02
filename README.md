@@ -19,5 +19,5 @@
 | P15 | Desenvolvedor de Software | Especialista | Rep |
 | P16 | Desenvolvedor de Software | Especialista | Ap |
 | P17 | Desenvolvedor de Software | Especialista | Ap |
-
-OBS: R426
+| P18 | Desenvolvedor de Software | Junior | Ap |
+OBS: R423
