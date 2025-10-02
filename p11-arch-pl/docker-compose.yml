@@ -1,0 +1,82 @@
+services:
+  api:
+    image: financial-image-app
+    container_name: financial-app
+    build:
+      context:  /Financial.WebApi
+      dockerfile: Dockerfile
+    depends_on: 
+      - database
+    ports:
+      - "44367:8080" # HTTP mapping
+    restart: always
+    environment: 
+      - DBHOST=database
+      - ASPNETCORE_ENVIRONMENT=Docker
+  api-report:
+    image: financial-report-image-app
+    container_name: financial-report-app
+    build:
+      context: /Financial.Report
+      dockerfile: Dockerfile
+    depends_on: 
+      - rabbitmq
+      - redis
+    ports:
+      - "44368:8080" # HTTP mapping
+    restart: always
+    environment: 
+      - DBHOST=databaserabbitmq
+      - ASPNETCORE_ENVIRONMENT=Docker      
+  yarp:
+    image: financial-yarp-image-app
+    container_name: yarp-financial-app
+    build:
+      context:  /Financial.Yarp
+      dockerfile: Financial.Yarp/Dockerfile
+    depends_on: 
+      - api
+      - api-report
+    ports:
+      - "44369:8080" # HTTP mapping
+    restart: always
+    environment: 
+      - ASPNETCORE_ENVIRONMENT=Docker
+  database:
+    image: postgres
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    expose: 
+      - 5432
+    volumes:
+      - db-volume:/var/lib/postgres
+    restart: always
+    environment:
+      - POSTGRES_DB=FinanciallaunchDB 
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres 
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    restart: always
+    ports:
+      - 5672:5672
+      - 15672:15672
+    environment:
+      RABBITMQ_DEFAULT_USER: financial
+      RABBITMQ_DEFAULT_PASS: financial
+    volumes:
+      - rabbitmq-lib:/var/lib/rabbitmq/
+      - rabbitmq-log:/var/log/rabbitmq
+  redis:
+    image: redis
+    command: redis-server --requirepass Redis2019!
+    ports:
+      - "6379:6379"
+volumes:
+  db-volume:
+  rabbitmq-lib:
+    driver: local
+  rabbitmq-log:
+    driver: local
