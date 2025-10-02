@@ -1,0 +1,31 @@
+Description,Type,Category,Amount,Date
+Venda balcão,Income,Vendas,8300,2025-01-04T10:30:00Z
+Pagamento de aluguel,Expense,Pagamentos,2500,2025-01-10T08:00:00Z
+Salário administrativo,Expense,Folha de Pagamento,9800,2025-01-28T08:00:00Z
+Lucro bruto de janeiro,Income,Lucros,4000,2025-01-31T18:00:00Z
+Venda online,Income,Vendas,12500,2025-02-03T13:30:00Z
+Pagamento de fornecedor,Expense,Pagamentos,3200,2025-02-10T09:15:00Z
+Folha de pagamento TI,Expense,Folha de Pagamento,11200,2025-02-28T08:00:00Z
+Lucro líquido de fevereiro,Income,Lucros,5100,2025-02-28T18:30:00Z
+Venda via aplicativo,Income,Vendas,9700,2025-03-06T11:00:00Z
+Pagamento de contas diversas,Expense,Pagamentos,2900,2025-03-10T07:45:00Z
+Salário logística,Expense,Folha de Pagamento,8700,2025-03-27T08:00:00Z
+Lucro líquido de março,Income,Lucros,3800,2025-03-31T18:00:00Z
+Venda direta,Income,Vendas,10200,2025-04-02T12:00:00Z
+Pagamento de energia,Expense,Pagamentos,2100,2025-04-06T09:00:00Z
+Salário comercial,Expense,Folha de Pagamento,9500,2025-04-25T08:00:00Z
+Lucro operacional abril,Income,Lucros,4200,2025-04-30T18:00:00Z
+Venda marketplace,Income,Vendas,8700,2025-05-03T10:00:00Z
+Pagamento manutenção,Expense,Pagamentos,2700,2025-05-07T08:30:00Z
+Folha de pagamento geral,Expense,Folha de Pagamento,12800,2025-05-28T08:00:00Z
+Lucro de maio,Income,Lucros,3900,2025-05-31T18:00:00Z
+Venda presencial,Income,Vendas,9400,2025-01-15T11:00:00Z
+Pagamento de taxas,Expense,Pagamentos,1800,2025-01-20T08:00:00Z
+Salário financeiro,Expense,Folha de Pagamento,10400,2025-02-27T08:00:00Z
+Lucro de operação,Income,Lucros,4600,2025-02-28T18:00:00Z
+Venda especial,Income,Vendas,11000,2025-03-08T13:00:00Z
+Pagamento de licenças,Expense,Pagamentos,2500,2025-03-15T08:00:00Z
+Salário marketing,Expense,Folha de Pagamento,9200,2025-03-29T08:00:00Z
+Lucro residual,Income,Lucros,3100,2025-03-31T18:00:00Z
+Venda promocional,Income,Vendas,7900,2025-05-12T14:00:00Z
+Pagamento de impostos,Expense,Pagamentos,3300,2025-05-20T08:00:00Z

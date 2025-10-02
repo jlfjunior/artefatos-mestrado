@@ -1,0 +1,110 @@
+<div class="min-h-screen bg-neutral-50 flex">
+  <!-- SIDE ==> -->
+  <div class="hidden lg:block relative w-1/2 bg-primary-700">
+    <div class="absolute inset-0 flex items-center justify-center">
+      <div class="flex flex-col items-center text-center text-white p-8">
+        <img src="assets/logo.png" alt="Logo Cashflow" class="w-20" />
+
+        <h1 class="mt-6 text-4xl font-bold">Cashflow App</h1>
+        <p class="mt-4 text-xl">Gerencie seu caixa com facilidade</p>
+        <div class="mt-8 space-y-4 text-left">
+          <div class="flex items-center">
+            <svg class="h-6 w-6 mr-3 text-secondary-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>Controle de Entradas e Saídas</span>
+          </div>
+          <div class="flex items-center">
+            <svg class="h-6 w-6 mr-3 text-secondary-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>Visão gerencial do seu fluxo de caixa</span>
+          </div>
+          <div class="flex items-center">
+            <svg class="h-6 w-6 mr-3 text-secondary-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>Relatórios financeiros</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- <== SIDE -->
+
+  <!-- FORM ==> -->
+  <div class="flex-1 flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-20 xl:px-24">
+    <div class="flex flex-col w-full max-w-sm lg:w-96">
+      <div class="w-full flex flex-col items-center justify-center">
+        <h2 class="mt-6 text-3xl font-extrabold text-neutral-900">Acesse sua conta</h2>
+      </div>
+
+      <div class="mt-8">
+        <div class="">
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4">
+            <div>
+              <label for="email" class="block text-sm font-medium text-neutral-700">Email:</label>
+              <div class="mt-1">
+                <input 
+                  id="email" 
+                  name="email" 
+                  type="email" 
+                  formControlName="email"
+                  autocomplete="email" 
+                  required 
+                  placeholder="Digite seu e-mail"
+                  class="w-full form-input"
+                  [ngClass]="{ 'border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500': f['email'].invalid && f['email'].touched }"
+                />
+                <div *ngIf="f['email'].invalid && f['email'].touched" class="mt-1 text-sm text-red-600">
+                  <span *ngIf="f['email'].errors?.['required']">Email é obrigatório</span>
+                  <span *ngIf="f['email'].errors?.['email']">Digite um e-mail válido</span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label for="password" class="block text-sm font-medium text-neutral-700">Senha:</label>
+              <div class="mt-1">
+                <input 
+                  id="password" 
+                  name="password" 
+                  type="password" 
+                  formControlName="password"
+                  autocomplete="current-password" 
+                  placeholder="Digite sua senha"
+                  required 
+                  class="w-full form-input"
+                  [ngClass]="{ 'border-red-300 text-red-900 placeholder-red-300 focus:outline-none focus:ring-red-500 focus:border-red-500': f['password'].invalid && f['password'].touched }"
+                />
+                <div *ngIf="f['password'].invalid && f['password'].touched" class="mt-1 text-sm text-red-600">
+                  <span *ngIf="f['password'].errors?.['required']">Senha é obrigatório</span>
+                  <span *ngIf="f['password'].errors?.['minlength']">A senha deve ter pelo menos 8 caracteres</span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <button 
+                type="submit" 
+                [disabled]="loginForm.invalid || loading"
+                [ngClass]="{
+                  'btn-primary': !loginForm.invalid && !loading,
+                  'btn-primary-disabled': loginForm.invalid || loading
+                }"
+                class="btn w-full flex items-center justify-center"
+              >
+                <svg *ngIf="loading" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Entrar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- <== FORM -->
+</div>

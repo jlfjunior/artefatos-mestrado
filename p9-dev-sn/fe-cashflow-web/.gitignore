@@ -1,0 +1,46 @@
+# Compiled output
+/dist
+/tmp
+/out-tsc
+/angular
+/build
+
+# Node
+/node_modules
+
+# IDEs e editores
+/.idea
+/.vscode
+*.sublime-project
+*.sublime-workspace
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Ambiente
+.env
+.env.*.local
+
+# Angular específico
+# Arquivos de build temporários
+/.angular/cache
+/.angular/config.json
+
+# Testes
+/coverage
+/test-results
+
+# Compilações do Sass
+*.sass-cache
+
+# VS Code settings (opcional, se você não quiser versionar essas configs)
+.vscode/
+
+# Arquivos de output de produção ou preview
+www/

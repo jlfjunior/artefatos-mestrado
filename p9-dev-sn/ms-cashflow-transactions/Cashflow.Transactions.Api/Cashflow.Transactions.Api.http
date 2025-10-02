@@ -1,0 +1,134 @@
+### Documentação e testes integrados dos endpoints do serviço ms-cashflow-transactions
+
+@Api = https://localhost:7270/api
+@access_token = Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJNRG9IVlA3VzVWZkZZVjVBTkdGRkdSRFlncXkybEVLVnFmYUR2bkZPM09vIn0.eyJleHAiOjE3NDg0OTAxODUsImlhdCI6MTc0ODQ4NjU4NSwianRpIjoib25ydHJvOmEzNTlmNWI5LWIxZDQtNGQ3OS05YmZiLTdlNTM4N2E4MWQ2NyIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MC9yZWFsbXMvY2FzaGZsb3ciLCJhdWQiOiJhY2NvdW50Iiwic3ViIjoiNjhiODNmODItMzgzMy00MDZmLTkzYjctMmUxZGMwYTg3ODcxIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiY2FzaGZsb3ctd2ViIiwic2lkIjoiYTJjM2ZmOTQtY2VhMi00Y2I5LTk1NDQtN2NjZmY0ZDJmMjRmIiwiYWNyIjoiMSIsImFsbG93ZWQtb3JpZ2lucyI6WyJodHRwOi8vbG9jYWxob3N0OjQyMDAiXSwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImRlZmF1bHQtcm9sZXMtY2FzaGZsb3ciLCJtYW5hZ2VyIiwib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiIsImVtcGxveWVlIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJwcm9maWxlIGVtYWlsIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsIm5hbWUiOiJSZW5hbiBNZWRpbmEiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJyZW5hbiIsImdpdmVuX25hbWUiOiJSZW5hbiIsImZhbWlseV9uYW1lIjoiTWVkaW5hIiwiZW1haWwiOiJhbHZlc3JlbmFuc2FudG9zQGhvdG1haWwuY29tIn0.d7O0ZEpi7tgWi-o8eF9z-tr8NDZQM8_HLI1CEhhwhSrN2fR8iyQJ7KtJ6KxUK-Tr0FbasyOGPNxlKaTGpF_MMGNouMbngdMBvVKhCMEOPWLB2hIzdg8_wXiAFWVQnBrvPG4IiIIqerfNJIo2ojSn4_zzEgLiU9eWbBgF2uGB-tt3Xyz9r6vx13tueCymqbYcpgX-jXxz6SpEYssrWyvIUADx--89DEfbvmusoYdUww9xpmw6-sxehtv06FZFeNDKijE09Q09I_Sb00iOZQS4dPHeSN8lfVObSdDT6m4cRBtj-fXfDWTx_H7wTVDhcDLd5mxSRfgfzMNUX3sv36cFdQ
+@page = 1
+@pageSize = 30
+@transactionId = 6837d039f25a0054d92ee10b
+
+### Endpoint de consulta com resumo das principais transações dos ultimos 30 dias.
+GET {{Api}}/v1/transactions/summary
+Authorization: {{access_token}}
+Accept: application/json
+
+# GetTransactionsSummaryResponse
+# {
+# 	transactions: [
+# 		{
+# 			transactionId: string,
+# 			description: string,
+# 			type: string,
+# 			date: datetime,
+# 			amount: decimal
+# 		},
+# 		{
+# 			transactionId: string,
+# 			description: string,
+# 			type: string,
+# 			date: datetime,
+# 			amount: decimal
+# 		},
+# 		...
+# 	]
+# }
+
+
+### Endpoint de consulta paginada de todas as transações com filtros por Tipo, Categoria e pesquisa com base na descrição.
+GET {{Api}}/v1/transactions?type=&category=&search=&page={{page}}&pageSize={{pageSize}}
+Authorization: {{access_token}}
+Accept: application/json
+
+# SearchTransactionsResponse
+# {
+# 	totalItems: int,
+# 	totalPages: int,
+# 	page: int,
+# 	pageSize: int,
+# 	items: [
+# 		{
+# 			transactionId: string,
+# 			description: string,
+# 			category: string,
+# 			type: string,
+# 			date: datetime,
+# 			amount: decimal
+# 		},
+# 		{
+# 			transactionId: string,
+# 			description: string,
+# 			category: string,
+# 			type: string,
+# 			date: datetime,
+# 			amount: decimal
+# 		},
+# 		...
+# 	]
+# }
+
+
+### Endpoint de consulta unitária da transaction.
+GET {{Api}}/v1/transactions/{{transactionId}}
+Authorization: {{access_token}}
+Accept: application/json
+
+# GetTransactionResponse
+# {
+#   transactionId: string,
+#   description: string,
+#   category: string,
+#   type: string,
+#   date: datetime,
+#   amount: decimal,
+#   createdAt: datetime,
+# }
+
+
+### Create transaction
+POST {{Api}}/v1/transactions
+Authorization: {{access_token}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "description": "Salário de Maio",
+  "type": "Income",
+  "category": "Lucro",
+  "amount": 5000,
+  "date": "2025-05-29T03:00:00.000Z"
+}
+
+
+### Massive create transactions (CSV upload)
+POST {{Api}}/v1/transactions/massive-create
+Authorization: Bearer {{access_token}}
+Content-Type: multipart/form-data
+
+--boundary
+Content-Disposition: form-data; name="file"; filename="transactions.csv"
+Content-Type: text/csv
+
+<./transactions.csv
+--boundary--
+
+
+### Edit transaction
+PUT {{Api}}/v1/transactions/{{transactionId}}
+Authorization: {{access_token}}
+Content-Type: application/json
+
+# EditTransactionInput
+{
+  "description": "Salário Atualizado",
+  "type": "Income",
+  "category": "Lucro",
+  "amount": 5200,
+  "date": "2025-05-25T03:00:00.000Z"
+}
+
+
+### Delete transaction
+DELETE {{Api}}/v1/transactions/{{transactionId}}
+Authorization: {{access_token}}
+Accept: application/json
+
+###

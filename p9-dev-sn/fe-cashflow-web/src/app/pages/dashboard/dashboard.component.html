@@ -1,0 +1,144 @@
+<div class="container mx-auto">
+  <div class="mb-6">
+    <h1 class="text-2xl font-semibold text-neutral-900">Dashboard</h1>
+    <p class="text-neutral-600">Bem-vindo, aqui está uma visão geral do seu caixa!</p>
+  </div>
+
+  <div *ngIf="loading" class="flex justify-center items-center h-64">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+  </div>
+
+  <div *ngIf="!loading">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+      <!-- CARD SALDO ==> -->
+      <div class="card">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-neutral-500 text-sm font-medium">Saldo Atual</h3>
+          <span class="p-1.5 rounded-full bg-primary-100">
+            <svg class="h-5 w-5 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+            </svg>
+          </span>
+        </div>
+        <div class="flex items-baseline mb-2">
+          <span class="text-2xl font-bold text-neutral-900">{{ formatCurrency(balance) }}</span>
+        </div>
+        <div class="flex items-center text-sm">
+          <span [ngClass]="{'text-green-600': balance > 0, 'text-red-600': balance < 0}">
+            Saldo {{ balance > 0 ? 'Positivo' : 'Negativo' }}
+          </span>
+        </div>
+      </div>
+      <!-- <== CARD SALDO -->
+      
+      <!-- CARD ENTRADAS ==> -->
+      <div class="card">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-neutral-500 text-sm font-medium">Total Entradas</h3>
+          <span class="p-1.5 rounded-full bg-green-100">
+            <svg class="h-5 w-5 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </span>
+        </div>
+        <div class="flex items-baseline mb-2">
+          <span class="text-2xl font-bold text-neutral-900">{{ formatCurrency(income) }}</span>
+        </div>
+        <div class="flex items-center text-sm text-green-600">
+          <svg class="h-4 w-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+          </svg>
+          <span>Últimos 30 dias</span>
+        </div>
+      </div>
+      <!-- <== CARD ENTRADAS -->
+      
+      <!-- CARD SAIDAS ==> -->
+      <div class="card">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-neutral-500 text-sm font-medium">Total Saídas</h3>
+          <span class="p-1.5 rounded-full bg-red-100">
+            <svg class="h-5 w-5 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          </span>
+        </div>
+        <div class="flex items-baseline mb-2">
+          <span class="text-2xl font-bold text-neutral-900">{{ formatCurrency(expenses) }}</span>
+        </div>
+        <div class="flex items-center text-sm text-red-600">
+          <svg class="h-4 w-4 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+          </svg>
+          <span>Últimos 30 dias</span>
+        </div>
+      </div>
+      <!-- <== CARD SAIDAS -->
+    </div>
+    
+    <!-- GRAFICO ==> -->
+    <div class="card mb-6">
+      <div class="flex">
+        <svg class="h-5 w-5 mr-1 mt-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" />
+        </svg>
+        <h3 class="text-lg font-medium text-neutral-900 mb-4">Entradas x Saídas</h3>
+      </div>
+      <div>
+        <div class="bg-white h-full p-6 rounded-lg flex items-center justify-center text-neutral-600">
+          <canvas class="w-96 " baseChart [data]="lineChartData" [options]="lineChartOptions" [type]="'line'"></canvas>
+        </div>
+      </div>
+    </div>
+    <!-- <== GRAFICO -->
+    
+    <!-- TABLE TRANS. RECENTES ==> -->
+    <div class="card">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex">
+          <svg class="h-5 w-5 mr-1 mt-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m9 14.25 6-6m4.5-3.493V21.75l-3.75-1.5-3.75 1.5-3.75-1.5-3.75 1.5V4.757c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0c1.1.128 1.907 1.077 1.907 2.185ZM9.75 9h.008v.008H9.75V9Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm4.125 4.5h.008v.008h-.008V13.5Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+          </svg>
+          <h3 class="text-lg font-medium text-neutral-900">Transações Recentes</h3>
+        </div>
+        <a 
+          routerLink="/transactions" 
+          class="text-sm font-medium text-primary-600 hover:text-primary-500"
+        >
+          Ver todas
+        </a>
+      </div>
+      
+      <div class="table-container">
+        <table class="table" [ngClass]="{'min-h-96': recentTransactions.length === 0}">
+          <thead>
+            <tr>
+              <th scope="col">Data</th>
+              <th scope="col">Descrição</th>
+              <th scope="col">Tipo</th>
+              <th scope="col">Valor</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let transaction of recentTransactions">
+              <td>{{ transaction.date | date:'d MMM y' }}</td>
+              <td>{{ transaction.description }}</td>
+              <td>
+                <span class="badge" [ngClass]="{ 'badge-blue': transaction.type === 'Income', 'badge-red': transaction.type === 'Expense' }">
+                  {{ transaction.type === 'Income' ? 'Entrada' : 'Saída' }}
+                </span>
+              </td>
+              <td>
+                {{ formatCurrency(transaction.amount) }}
+              </td>
+            </tr>
+            <tr *ngIf="recentTransactions.length === 0">
+              <td colspan="5" class="text-center py-4 text-neutral-500">Transações recentes não encontradas...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <!-- <== TABLE TRANS. RECENTES -->
+  </div>
+</div>

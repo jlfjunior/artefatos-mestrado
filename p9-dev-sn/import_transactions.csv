@@ -1,0 +1,34 @@
+﻿Description,Type,Category,Amount,Date
+Venda de serviços,Income,Vendas,7200,2025-04-05T14:12:00.000Z
+Pagamento de fornecedor,Expense,Pagamentos,1800,2025-04-08T09:00:00.000Z
+Salário equipe comercial,Expense,Folha de Pagamento,12000,2025-03-30T08:00:00.000Z
+Receita com venda online,Income,Vendas,15000,2025-04-12T15:45:00.000Z
+Lucro líquido do mês,Income,Lucros,3500,2025-04-30T18:00:00.000Z
+Pagamento de energia,Expense,Pagamentos,950,2025-04-10T10:30:00.000Z
+Comissão de vendas,Expense,Folha de Pagamento,3200,2025-03-27T09:15:00.000Z
+Venda balcão,Income,Vendas,4200,2025-05-01T12:00:00.000Z
+Pagamento fornecedor externo,Expense,Pagamentos,2100,2025-05-03T08:30:00.000Z
+Distribuição de lucros,Income,Lucros,5000,2025-03-31T16:45:00.000Z
+Venda com cartão,Income,Vendas,9600,2025-04-25T13:30:00.000Z
+Pagamento de aluguel,Expense,Pagamentos,2500,2025-04-02T08:00:00.000Z
+Salário administrativo,Expense,Folha de Pagamento,10500,2025-04-29T09:00:00.000Z
+Lucro acumulado,Income,Lucros,6200,2025-05-10T17:00:00.000Z
+Venda com desconto,Income,Vendas,3800,2025-05-15T14:00:00.000Z
+Pagamento de impostos,Expense,Pagamentos,4600,2025-03-25T11:00:00.000Z
+Salário técnicos,Expense,Folha de Pagamento,9800,2025-05-01T07:30:00.000Z
+Lucro sobre serviços,Income,Lucros,4100,2025-05-05T10:00:00.000Z
+Venda atacado,Income,Vendas,11200,2025-05-07T16:30:00.000Z
+Pagamento fornecedor local,Expense,Pagamentos,1700,2025-04-15T10:45:00.000Z
+Adiantamento de salário,Expense,Folha de Pagamento,3000,2025-04-20T08:00:00.000Z
+Lucro de operação,Income,Lucros,5300,2025-05-12T12:00:00.000Z
+Venda promocional,Income,Vendas,2700,2025-05-14T15:00:00.000Z
+Pagamento de manutenção,Expense,Pagamentos,1350,2025-04-18T13:00:00.000Z
+Bônus mensal equipe,Expense,Folha de Pagamento,2200,2025-04-30T17:30:00.000Z
+Lucro reinvestido,Income,Lucros,4800,2025-05-18T10:00:00.000Z
+Venda especial,Income,Vendas,6800,2025-04-22T14:30:00.000Z
+Pagamento de taxa bancária,Expense,Pagamentos,150,2025-05-06T09:00:00.000Z
+Folha bônus abril,Expense,Folha de Pagamento,2000,2025-04-27T10:00:00.000Z
+Lucro extraordinário,Income,Lucros,7600,2025-05-20T18:00:00.000Z
+Conta de agua,Expense,Pagamentos,650,2025-05-14T18:23:21.000Z
+Boletos,Expense,Pagamentos,4600,2025-05-14T18:23:21.000Z
+Carnês,Expense,Pagamentos,3800,2025-05-14T18:23:21.000Z

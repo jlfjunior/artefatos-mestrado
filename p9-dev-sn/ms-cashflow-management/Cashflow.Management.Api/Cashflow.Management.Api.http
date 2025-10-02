@@ -1,0 +1,50 @@
+### Documentação e testes integrados dos endpoints do serviço ms-cashflow-management
+
+@Api = https://localhost:7014/api
+@access_token = Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJNRG9IVlA3VzVWZkZZVjVBTkdGRkdSRFlncXkybEVLVnFmYUR2bkZPM09vIn0.eyJleHAiOjE3NDg0OTAxODUsImlhdCI6MTc0ODQ4NjU4NSwianRpIjoib25ydHJvOmEzNTlmNWI5LWIxZDQtNGQ3OS05YmZiLTdlNTM4N2E4MWQ2NyIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODA4MC9yZWFsbXMvY2FzaGZsb3ciLCJhdWQiOiJhY2NvdW50Iiwic3ViIjoiNjhiODNmODItMzgzMy00MDZmLTkzYjctMmUxZGMwYTg3ODcxIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiY2FzaGZsb3ctd2ViIiwic2lkIjoiYTJjM2ZmOTQtY2VhMi00Y2I5LTk1NDQtN2NjZmY0ZDJmMjRmIiwiYWNyIjoiMSIsImFsbG93ZWQtb3JpZ2lucyI6WyJodHRwOi8vbG9jYWxob3N0OjQyMDAiXSwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImRlZmF1bHQtcm9sZXMtY2FzaGZsb3ciLCJtYW5hZ2VyIiwib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiIsImVtcGxveWVlIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJwcm9maWxlIGVtYWlsIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsIm5hbWUiOiJSZW5hbiBNZWRpbmEiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJyZW5hbiIsImdpdmVuX25hbWUiOiJSZW5hbiIsImZhbWlseV9uYW1lIjoiTWVkaW5hIiwiZW1haWwiOiJhbHZlc3JlbmFuc2FudG9zQGhvdG1haWwuY29tIn0.d7O0ZEpi7tgWi-o8eF9z-tr8NDZQM8_HLI1CEhhwhSrN2fR8iyQJ7KtJ6KxUK-Tr0FbasyOGPNxlKaTGpF_MMGNouMbngdMBvVKhCMEOPWLB2hIzdg8_wXiAFWVQnBrvPG4IiIIqerfNJIo2ojSn4_zzEgLiU9eWbBgF2uGB-tt3Xyz9r6vx13tueCymqbYcpgX-jXxz6SpEYssrWyvIUADx--89DEfbvmusoYdUww9xpmw6-sxehtv06FZFeNDKijE09Q09I_Sb00iOZQS4dPHeSN8lfVObSdDT6m4cRBtj-fXfDWTx_H7wTVDhcDLd5mxSRfgfzMNUX3sv36cFdQ
+@interval = "D"
+@page = 1
+@pageSize = 30
+
+
+### Endpoint de consulta de saldo atual, entradas e saidas contabilizados nos ultimos 30 dias.
+GET {{Api}}/v1/cash-statement/summary
+Authorization: {{access_token}}
+Accept: application/json
+
+# GetCashStatementSummaryResponse
+# {
+#   currentBalance: decimal,
+#   totalInflows: decimal,
+#   totalOutflows: decimal
+# }
+
+
+### Endpoint de consulta do fluxo de caixa consolidado
+GET {{Api}}/v1/cash-statement/report/consolidated?interval={{interval}}&page={{page}}&pageSize={{pageSize}}
+Authorization: {{access_token}}
+Accept: application/json
+
+# GetCashStatementConsolidatedResponse
+# {
+# 	totalItems: int,
+# 	totalPages: int,
+# 	page: int,
+# 	pageSize: int,
+# 	items: [
+# 		{
+# 			date: DateTime,
+# 			totalInflows: decimal,
+# 			totalOutflows: decimal,
+# 			totalBalance: decimal
+# 		},
+# 		{
+# 			date: DateTime,
+# 			totalInflows: decimal,
+# 			totalOutflows: decimal,
+# 			totalBalance: decimal
+# 		},
+# 		...
+# 	]
+# }
+###

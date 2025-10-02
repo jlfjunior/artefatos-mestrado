@@ -1,0 +1,90 @@
+﻿using Cashflow.Management.Application.EventService;
+using Cashflow.Management.Application.Requests.ConsolidateTransaction;
+using Cashflow.Management.Workers.Events;
+using MediatR;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
+using System.Text;
+using System.Text.Json;
+
+namespace Cashflow.Management.Workers.EventWorkers
+{
+    public class CreatedTransactionConsumerWorker : BackgroundService
+    {
+        private readonly RabbitConfig _rabbitConfig;
+        private readonly ILogger<CreatedTransactionConsumerWorker> _logger;
+        private readonly IServiceProvider _serviceProvider;
+
+        public CreatedTransactionConsumerWorker(IOptions<RabbitConfig> options, ILogger<CreatedTransactionConsumerWorker> logger, IServiceProvider serviceProvider)
+        {
+            _rabbitConfig = options.Value;
+            _logger = logger;
+            _serviceProvider = serviceProvider;
+        }
+
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            _logger.LogInformation("START [CREATE-TRANSACTION-CONSUMER-WORKER]: {time}", DateTimeOffset.Now);
+
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                var factory = new ConnectionFactory
+                {
+                    HostName = _rabbitConfig.Host,
+                    UserName = _rabbitConfig.User,
+                    Password = _rabbitConfig.Password
+                };
+
+                try
+                {
+                    using var connection = await factory.CreateConnectionAsync(stoppingToken);
+                    using var channel = await connection.CreateChannelAsync(cancellationToken: stoppingToken);
+
+                    var queue = EventQueueAttributeExtensions.GetEventQueue<CreatedTransactionEvent>();
+
+                    await channel.QueueDeclareAsync(queue: queue, durable: false, exclusive: false, autoDelete: false, arguments: null, cancellationToken: stoppingToken);
+
+                    var consumer = new AsyncEventingBasicConsumer(channel);
+                    consumer.ReceivedAsync += async (model, ea) =>
+                    {
+                        var body = ea.Body.ToArray();
+                        var message = Encoding.UTF8.GetString(body);
+
+                        var createBotEvent = JsonSerializer.Deserialize<CreatedTransactionEvent>(message);
+                        _logger.LogInformation("Received message: {message}", message);
+
+                        var request = new ConsolidateTransactionRequest()
+                        {
+                            TransactionId = createBotEvent.TransactionId,
+                            Type = createBotEvent.Type,
+                            Amount = createBotEvent.Amount,
+                            Date = createBotEvent.Date
+                        };
+
+                        _logger.LogInformation("Request Handler: {request}", request);
+
+                        using var scope = _serviceProvider.CreateScope();
+
+                        var _mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+
+                        await _mediator.Send(request, stoppingToken);
+
+                        await channel.BasicAckAsync(deliveryTag: ea.DeliveryTag, multiple: false, cancellationToken: stoppingToken);
+                    };
+
+                    await channel.BasicConsumeAsync(queue, autoAck: false, consumer: consumer, cancellationToken: stoppingToken);
+
+                    await Task.Delay(600000, stoppingToken);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.Message);
+                }
+            }
+        }
+    }
+}
