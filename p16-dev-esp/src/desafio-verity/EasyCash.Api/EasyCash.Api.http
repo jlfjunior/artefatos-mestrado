@@ -1,0 +1,40 @@
+@BaseUrl = https://localhost:7152
+
+### Criar Usuário
+POST {{BaseUrl}}/api/v1/users/register
+Accept: application/json
+Content-Type: application/json
+
+{
+  "email": "test@easycash.com.br",
+  "firstName": "new",
+  "lastName": "user",
+  "password": "123456"
+}
+
+### Login
+POST {{BaseUrl}}/api/v1/users/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "email": "test@easycash.com.br",
+  "password": "123456"
+}
+
+### Transação
+@AccessToken = eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJXdG0yeHdRNm1oXzd5cnR2d3dWcFVkbEtaTXM2Nm9sOGhTZ250bmxSbnVRIn0.eyJleHAiOjE3NDEyMDkzOTksImlhdCI6MTc0MTIwNTc5OSwianRpIjoiYTZlMDgyN2UtMWRmMy00YTEwLTllN2MtYzdhOTM1YTJiYjJlIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDoxODA4MC9yZWFsbXMvZWFzeWNhc2giLCJhdWQiOiJhY2NvdW50Iiwic3ViIjoiNzBmOWRmNWItZjEyZS00ZTUxLTljMGUtMDJlMjk0N2M1NGQ0IiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiZWFzeWNhc2gtYXV0aC1jbGllbnQiLCJzaWQiOiJhM2RlMWJhNC1jMGQ3LTQ4NTAtYjc2ZS1hNjc2YWJkZTE2MWMiLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiIsImRlZmF1bHQtcm9sZXMtZWFzeWNhc2giLCJjb2xsYWJvcmF0b3I6YWxsIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJvcGVuaWQgZW1haWwgcHJvZmlsZSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoibmV3IHVzZXIiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJ0ZXN0QGVhc3ljYXNoLmNvbS5iciIsImdpdmVuX25hbWUiOiJuZXciLCJmYW1pbHlfbmFtZSI6InVzZXIiLCJlbWFpbCI6InRlc3RAZWFzeWNhc2guY29tLmJyIn0.iV_NHW4bKSTiqcfrc6sVitn4k-xRRNBW_HMvpdGgdR5an75q2hexTwRdZX6wg_-m19U-A5GTfB3kFYq48ERw3W6mww8f0osto0FiXdwLrT8tMHg7sw27uA2KLEsnUNKo6FRwxDOFxqTBA9wGB7q1w6sZkomAgRHEu0ojTvsAtCK3BsNQK-wUZmvyMVrbDQZrE_pEKN-yKnal_Y7IBqdffSezJ0D-xpSBqf5T6kenAv5b6Ggs7KizvZTwFuz-2IEghNwC80Z5CD-BpwTx1w0_bvqjP1WWm6EGAPL7BznJEV2Im6hb_KwZnHhL1ZmO3vsIEzlB43wgzvxdHpD51flbQw
+
+POST {{BaseUrl}}/api/v1/Transactions
+Accept: application/json
+Authorization: Bearer {{AccessToken}}
+Content-Type: application/json
+
+{
+  "idempotencyKey": "2b161a75-2717-40a4-a7c6-fed2b1b255d6",
+  "description": "Description",
+  "type": 1,
+  "amount": 100,
+  "category": "categoria",
+  "date": "2025-03-05T23:47:59.508Z"
+}

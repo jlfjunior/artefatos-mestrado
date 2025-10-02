@@ -1,0 +1,64 @@
+services:
+  # easycash.api:
+  #   container_name: EasyCash.Api
+  #   build:
+  #     context: ./src/desafio-verity
+  #     dockerfile: EasyCash.Api/Dockerfile
+  #   ports:
+  #     - 8080:8082
+  #   depends_on:
+  #     - easycash-db
+  #     - easycash-idp
+  #     - easycash-redis
+  #     - easycash-aspire-dashboard
+  #   environment:
+  #     - ASPNETCORE_HTTP_PORTS=8082
+  #     - OTEL_EXPORTER_OTLP_ENDPOINT=http://easycash-aspire-dashboard:18889
+  #     - ASPNETCORE_ENVIRONMENT=Development
+  #     - ASPNETCORE_URLS=http://+:8082
+  #   command: ["dockerize", "-wait", "tcp://easycash-db:5432", "-wait", "tcp://easycash-idp:8080", "-wait", "tcp://easycash-redis:6379", "-wait", "tcp://easycash-aspire-dashboard:18888", "-timeout", "30s", "dotnet", "EasyCash.Api.dll"]
+
+  easycash-db:
+    image: postgres:latest
+    container_name: easycash.Db
+    environment:
+     #- POSTGRES_DB=easycash
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    # volumes:
+    #   - ./.containers/database:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    command: >
+      bash -c "docker-entrypoint.sh postgres & sleep 5 && 
+      psql -U postgres -c 'CREATE DATABASE easycash;' &&
+      psql -U postgres -c 'CREATE DATABASE easycash_report;' &&
+      wait"
+
+  easycash-idp:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: easycash.Identity
+    command: start-dev --import-realm
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+    volumes:
+      #- ./.containers/identity:/opt/keycloak/data
+      - ./.files/easycash-realm-export.json:/opt/keycloak/data/import/realm.json
+    ports:
+      - 18080:8080
+
+  easycash-redis:
+    image: redis:latest
+    container_name: easycash.Redis
+    restart: always
+    ports:
+      - '6379:6379'
+
+  easycash-aspire-dashboard:
+    image: mcr.microsoft.com/dotnet/aspire-dashboard:latest
+    container_name: easycash-aspire-dashboard
+    ports:
+      - "18888:18888"
+      - "4317:18889"
+    restart: always

@@ -1,0 +1,31 @@
+@BaseUrl = https://localhost:7152
+@EasyCash.Report.Api_HostAddress = https://localhost:7141
+
+### Login
+POST {{BaseUrl}}/api/v1/users/login
+Accept: application/json
+Content-Type: application/json
+
+{
+  "email": "test@easycash.com.br",
+  "password": "123456"
+}
+
+### Transação
+@AccessToken = eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJXdG0yeHdRNm1oXzd5cnR2d3dWcFVkbEtaTXM2Nm9sOGhTZ250bmxSbnVRIn0.eyJleHAiOjE3NDEyMTQyODIsImlhdCI6MTc0MTIxMDY4MiwianRpIjoiY2U1ZmM5MDYtNzFlOS00NzhmLWJiOTYtNDU2MmMyNjk1OWJlIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDoxODA4MC9yZWFsbXMvZWFzeWNhc2giLCJhdWQiOiJhY2NvdW50Iiwic3ViIjoiNzBmOWRmNWItZjEyZS00ZTUxLTljMGUtMDJlMjk0N2M1NGQ0IiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiZWFzeWNhc2gtYXV0aC1jbGllbnQiLCJzaWQiOiI4ZDcyMDAyZC1kNThmLTRkNTMtYWE1Ni0xODRhYmE0NTI0ZDEiLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiIsImRlZmF1bHQtcm9sZXMtZWFzeWNhc2giLCJjb2xsYWJvcmF0b3I6YWxsIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJvcGVuaWQgZW1haWwgcHJvZmlsZSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYW1lIjoibmV3IHVzZXIiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJ0ZXN0QGVhc3ljYXNoLmNvbS5iciIsImdpdmVuX25hbWUiOiJuZXciLCJmYW1pbHlfbmFtZSI6InVzZXIiLCJlbWFpbCI6InRlc3RAZWFzeWNhc2guY29tLmJyIn0.LpTWmr2b7iR0W1I-6taDYlWrYhynE3Uejq58CD19QqgBP6lG4NZQS7xZ6MT-54apEoZBwjltZ--MZFocYttZblPVIvwMBcxxqrHGxSfkD0hJlaRr19T7xnuM9wYTGFbYDsnnuFNMJO8U5NGYqJm12T82WBC9RghnPAy5iC3xoDUEB9cDLtw7Uv9ip3UtwhlvNeofVtLV7AONW_yB5zPn08RqGSEcDFiuxplYiBKgtMzAUdIc7-dkfMZ7jlFYilIDv9PYfQcWp0zHzvKFdzXZMdfYIZ4-FwwyWiow7En8AxUqAI3JRjBdJhRzUGhMJ5dyRD6fqzEW18aNXmwv2ZqSHQ
+
+# Consolidar por data
+POST {{EasyCash.Report.Api_HostAddress}}/api/v1/Consolidations
+Accept: application/json
+Authorization: Bearer {{AccessToken}}
+Content-Type: application/json
+
+{
+  "date": "2025-03-03"
+}
+
+### Relatorio por datas
+GET {{EasyCash.Report.Api_HostAddress}}/api/v1/Consolidations?StartDate=2025-03-03&EndDate=2025-03-05
+Accept: application/json
+Authorization: Bearer {{AccessToken}}
+Content-Type: application/json

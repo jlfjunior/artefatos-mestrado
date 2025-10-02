@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>f6043be0-9579-4c9e-be0b-0b5351c45cd1</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Asp.Versioning.Mvc" Version="8.1.0" />
+    <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
+    <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
+    <PackageReference Include="Serilog" Version="4.2.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EasyCash.Abstractions\EasyCash.Abstractions.csproj" />
+    <ProjectReference Include="..\EasyCash.Background.Jobs\EasyCash.Background.Jobs.csproj" />
+    <ProjectReference Include="..\EasyCash.Command.Store\EasyCash.Command.Store.csproj" />
+    <ProjectReference Include="..\EasyCash.Command\EasyCash.Command.csproj" />
+    <ProjectReference Include="..\EasyCash.Domain\EasyCash.Domain.csproj" />
+    <ProjectReference Include="..\EasyCash.HealthCheck.Provider\EasyCash.HealthCheck.Provider.csproj" />
+    <ProjectReference Include="..\EasyCash.Keycloak.Identity.Provider\EasyCash.Keycloak.Identity.Provider.csproj" />
+    <ProjectReference Include="..\EasyCash.OpenTelemetry\EasyCash.OpenTelemetry.csproj" />
+    <ProjectReference Include="..\EasyCash.Query.Store\EasyCash.Query.Store.csproj" />
+    <ProjectReference Include="..\EasyCash.Query\EasyCash.Query.csproj" />
+    <ProjectReference Include="..\EasyCash.Redis.Provider\EasyCash.Redis.Provider.csproj" />
+  </ItemGroup>
+
+</Project>

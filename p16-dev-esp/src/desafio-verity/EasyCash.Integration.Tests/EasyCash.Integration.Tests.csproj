@@ -1,0 +1,50 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include=".files\easycash-realm-export.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Bogus" Version="35.6.2" />
+    <PackageReference Include="coverlet.collector" Version="6.0.0" />
+    <PackageReference Include="FluentAssertions" Version="8.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.13" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.13" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="Moq" Version="4.20.72" />
+    <PackageReference Include="RestSharp" Version="112.1.0" />
+    <PackageReference Include="Testcontainers.Keycloak" Version="4.3.0" />
+    <PackageReference Include="Testcontainers.PostgreSql" Version="4.3.0" />
+    <PackageReference Include="Testcontainers.Redis" Version="4.3.0" />
+    <PackageReference Include="xunit" Version="2.5.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EasyCash.Api\EasyCash.Api.csproj" />
+    <ProjectReference Include="..\EasyCash.Command.Store\EasyCash.Command.Store.csproj" />
+    <ProjectReference Include="..\EasyCash.Command\EasyCash.Command.csproj" />
+    <ProjectReference Include="..\EasyCash.Dapper.Provider\EasyCash.Dapper.Provider.csproj" />
+    <ProjectReference Include="..\EasyCash.Domain\EasyCash.Domain.csproj" />
+    <ProjectReference Include="..\EasyCash.Keycloak.Identity.Provider\EasyCash.Keycloak.Identity.Provider.csproj" />
+    <ProjectReference Include="..\EasyCash.Query.Store\EasyCash.Query.Store.csproj" />
+    <ProjectReference Include="..\EasyCash.Query\EasyCash.Query.csproj" />
+    <ProjectReference Include="..\EasyCash.Redis.Provider\EasyCash.Redis.Provider.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+</Project>
