@@ -11,5 +11,6 @@
 | P7 | Arquiteto de Software | Senior | Ap |
 | P8 | Desenvolvedor de Software | Senior | Ap |
 | P9 | Desenvolvedor de Software | Senior | Ap |
+| P10 | Desenvolvedor de Software | Senior | Rep |
 
 OBS: R499
