@@ -16,4 +16,5 @@
 | P12 | Desenvolvedor de Software | Pleno | Rep |
 | P13 | Desenvolvedor de Software | Senior | Rep |
 | P14 | Desenvolvedor de Software | Senior | Rep |
+| P15 | Desenvolvedor de Software | Especialista | Rep |
 OBS: R466

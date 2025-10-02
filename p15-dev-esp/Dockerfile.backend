@@ -1,0 +1,54 @@
+# Etapa 1: Construção do Backend com SDK
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build_backend
+
+WORKDIR /app
+
+# Copiar o código-fonte do backend
+COPY src/ /app/src/
+
+# Restaurar dependências do backend
+RUN dotnet restore /app/src/App/LaunchService/LaunchService.csproj
+RUN dotnet restore /app/src/App/AuthenticationService/AuthenticationService.csproj
+RUN dotnet restore /app/src/App/ConsolidationService/ConsolidationService.csproj
+
+# Publicar o backend
+RUN dotnet publish /app/src/App/LaunchService/LaunchService.csproj -c Release -o /app/publish/LaunchService
+RUN dotnet publish /app/src/App/AuthenticationService/AuthenticationService.csproj -c Release -o /app/publish/AuthenticationService
+RUN dotnet publish /app/src/App/ConsolidationService/ConsolidationService.csproj -c Release -o /app/publish/ConsolidationService
+
+# Etapa 2: Construção Final (com Backend e Frontend)
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+
+WORKDIR /app
+
+# Copiar os arquivos compilados do backend
+COPY --from=build_backend /app/publish/LaunchService /app/launchservice
+COPY --from=build_backend /app/publish/AuthenticationService /app/authenticationservice
+COPY --from=build_backend /app/publish/ConsolidationService /app/consolidationservice
+
+# Verificar se os arquivos appsettings.json existem e copiar para as pastas corretas
+# Os appsettings.json devem estar na raiz das pastas de publicação
+COPY src/App/LaunchService/appsettings.json /app/launchservice/
+COPY src/App/AuthenticationService/appsettings.json /app/authenticationservice/
+COPY src/App/ConsolidationService/appsettings.json /app/consolidationservice/
+
+# Expor as portas para o backend
+EXPOSE 5000
+EXPOSE 5001
+EXPOSE 5002
+EXPOSE 5003
+
+# Definir variáveis de ambiente para o backend
+ENV ASPNETCORE_URLS=http://0.0.0.0:5000
+
+# Copiar o script de inicialização
+COPY entrypoint.sh /entrypoint.sh
+
+# Tornar o script executável
+RUN chmod +x /entrypoint.sh
+
+# Garantir que os arquivos de execução tenham permissões corretas
+RUN chmod -R 755 /app
+
+# Usar o script como entrypoint
+ENTRYPOINT ["/entrypoint.sh"]

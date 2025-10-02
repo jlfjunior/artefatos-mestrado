@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - "5001:5001"
+      - "5002:5002"
+      - "5003:5003"
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=CashFlowControlDb;User Id=sa;Password=CfcAdmin123!;TrustServerCertificate=True
+      - RabbitMQ__Host=rabbitmq
+      - ASPNETCORE_URLS=http://0.0.0.0:5001
+      - MongoDB__ConnectionString=mongodb://mongodb:27017
+      - MongoDB__DatabaseName=ConsolidationDB
+    networks:
+      - app_network
+    depends_on:
+      - mongodb
+      - rabbitmq
+      - sqlserver
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "80:80"
+    networks:
+      - app_network
+    depends_on:
+      - backend
+
+  mongodb:
+    image: mongo:latest
+    environment:
+      - MongoDB__ConnectionString=mongodb://mongodb:27017
+      - MongoDB__DatabaseName=ConsolidationDB
+    networks:
+      - app_network
+
+  rabbitmq:
+    image: rabbitmq:management
+    networks:
+      - app_network
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=CfcAdmin123!
+    ports:
+        - "1433:1433"
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge

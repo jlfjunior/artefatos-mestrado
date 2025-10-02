@@ -1,0 +1,27 @@
+# Etapa 1: Construção do Frontend React
+FROM node:18 AS build_frontend
+
+WORKDIR /app
+
+COPY src/App/CashFlowControl/CashFlowControl/package*.json /app
+
+RUN npm install
+
+COPY src/App/CashFlowControl/CashFlowControl/ /app 
+
+RUN npm run build
+
+# Etapa 2: Servir o Frontend com Nginx
+FROM nginx:alpine AS serve_frontend
+
+RUN rm -rf /usr/share/nginx/html/*
+
+COPY --from=build_frontend /app/build /usr/share/nginx/html
+
+# Copia o arquivo nginx.conf para o contêiner
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Copia o arquivo de configuração do servidor (como default.conf)
+COPY default.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80

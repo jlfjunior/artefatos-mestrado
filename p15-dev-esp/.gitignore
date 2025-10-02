@@ -1,0 +1,41 @@
+# Ignore build files
+**/bin/
+**/obj/
+
+# Ignore Docker files
+*.log
+docker-compose.override.yml
+.docker/
+
+# Ignore Visual Studio and Rider configuration files
+.vs/
+.idea/
+.vscode/
+
+# Ignore user configuration files for Windows
+Thumbs.db
+Desktop.ini
+
+# Ignore package files
+*.nupkg
+*.tar.gz
+*.tgz
+
+# Ignore .NET files
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Ignore test coverage files
+coverage/
+
+# Ignore temporary system files
+.DS_Store
+
+# Ignore csproj.user files
+*.csproj.user
+
+# Ignore log folders and files
+Logs/
+*.log
+log-*.txt
