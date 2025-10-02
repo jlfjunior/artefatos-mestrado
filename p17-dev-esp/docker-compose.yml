@@ -1,0 +1,196 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    restart: always 
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=1809@Mudar
+    ports:
+      - "1433:1433"
+    networks:
+      - backend
+
+  rabbitmq:
+    image: "rabbitmq:management"
+    container_name: rabbitmq
+    restart: always 
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    networks:
+      - backend
+
+  cashflowcontrol.permissions.api:
+    image: fernandoribeiroalves/permissions-api:develop-v1
+    container_name: cashflowcontrol.permissions.api
+    build:
+      context: .
+      dockerfile: src/Services/CashFlowControl.Permissions.API/Dockerfile
+    restart: always 
+    ports:
+      - "7043:7043"
+      - "5290:5290"
+    depends_on:
+      - sqlserver
+      - rabbitmq
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS="http://+:5290;https://+:7043"
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=CashFlowDb;User Id=sa;Password=1809@Mudar;TrustServerCertificate=True;
+      - ConnectionStrings__MasterConnection=Server=sqlserver;Database=Master;User Id=sa;Password=1809@Mudar;TrustServerCertificate=True;
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/cert.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=102030@Certs
+      - Jwt__SecretKey=b3Bt0k3n!$@reM@nd4t0ryF0rJWT_32C
+      - Jwt__Issuer=https://cashflowcontrol.permissions.api
+      - UserAdmin__Email=admin@cashflowcontrol.com
+      - UserAdmin__UserName=admin@cashflowcontrol.com
+      - UserAdmin__FullName=Admin
+      - UserAdmin__Password=Admin@123
+    volumes:
+      - ./certs:/https:ro
+    networks:
+      - backend
+
+  cashflowcontrol.launchcontrol.api:
+    image: fernandoribeiroalves/launchcontrol-api:develop-v1
+    container_name: cashflowcontrol.launchcontrol.api
+    build:
+      context: .
+      dockerfile: src/Services/CashFlowControl.LaunchControl.API/Dockerfile
+    restart: always 
+    ports:
+      - "7253:7253"
+      - "5166:5166"
+    depends_on:
+      - sqlserver
+      - rabbitmq
+      - cashflowcontrol.permissions.api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS="http://+:5166;https://+:7253"
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=CashFlowDb;User Id=sa;Password=1809@Mudar;TrustServerCertificate=True;
+      - ConnectionStrings__MasterConnection=Server=sqlserver;Database=Master;User Id=sa;Password=1809@Mudar;TrustServerCertificate=True;
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Port=5672
+      - RabbitMQ__Username=guest
+      - RabbitMQ__Password=guest
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/cert.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=102030@Certs
+      - urlApiAuth=https://cashflowcontrol.permissions.api:7043
+      - Jwt__SecretKey=b3Bt0k3n!$@reM@nd4t0ryF0rJWT_32C
+      - Jwt__Issuer=https://cashflowcontrol.permissions.api
+      - Jwt__Audience=https://cashflowcontrol.LaunchControl.api
+    volumes:
+      - ./certs:/https:ro
+    networks:
+      - backend
+
+  cashflowcontrol.dailyconsolidation.api:
+    image: fernandoribeiroalves/dailyconsolidation-api:develop-v1
+    container_name: cashflowcontrol.dailyconsolidation.api
+    build:
+      context: .
+      dockerfile: src/Services/CashFlowControl.DailyConsolidation.API/Dockerfile
+    restart: always 
+    ports:
+      - "7047:7047"
+      - "5043:5043"
+    depends_on:
+      - sqlserver
+      - rabbitmq
+      - cashflowcontrol.permissions.api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS="http://+:5043;https://+:7047"
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=CashFlowDb;User Id=sa;Password=1809@Mudar;TrustServerCertificate=True;
+      - ConnectionStrings__MasterConnection=Server=sqlserver;Database=Master;User Id=sa;Password=1809@Mudar;TrustServerCertificate=True;
+      - TransactionApiUrl=https://cashflowcontrol.launchcontrol.api:7253/api/Transaction
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Port=5672
+      - RabbitMQ__Username=guest
+      - RabbitMQ__Password=guest
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/cert.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=102030@Certs
+      - urlApiAuth=https://cashflowcontrol.permissions.api:7043
+      - Jwt__SecretKey=b3Bt0k3n!$@reM@nd4t0ryF0rJWT_32C
+      - Jwt__Issuer=https://cashflowcontrol.permissions.api
+      - Jwt__Audience=https://cashflowcontrol.dailyConsolidation.api
+    volumes:
+      - ./certs:/https:ro
+    networks:
+      - backend
+
+  cashflowcontrol.apigateway.api:
+    image: fernandoribeiroalves/apigateway-api:develop-v1
+    container_name: cashflowcontrol.apigateway.api
+    build:
+      context: .
+      dockerfile: src/Services/CashFlowControl.ApiGateway.API/Dockerfile
+    restart: always 
+    ports:
+      - "7144:7144"
+      - "5230:5230"
+    depends_on:
+      - sqlserver
+      - rabbitmq
+      - cashflowcontrol.permissions.api
+      - cashflowcontrol.launchcontrol.api
+      - cashflowcontrol.dailyconsolidation.api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS="http://+:5230;https://+:7144"
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/cert.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=102030@Certs
+      - urlApiAuth=https://cashflowcontrol.permissions.api:7043
+      - DocsSwagger__Launchcontrol=http://cashflowcontrol.launchcontrol.api:5166/swagger/v1/swagger.json
+      - DocsSwagger__Dailyconsolidation=http://cashflowcontrol.dailyconsolidation.api:5043/swagger/v1/swagger.json
+      - DocsSwagger__Permissions=http://cashflowcontrol.permissions.api:5290/swagger/v1/swagger.json
+      - Jwt__SecretKey=b3Bt0k3n!$@reM@nd4t0ryF0rJWT_32C
+      - Jwt__Issuer=https://cashflowcontrol.permissions.api
+      - Jwt__Audience=https://cashflowcontrol.apiGateway.api
+    volumes:
+      - ./certs:/https:ro
+    networks:
+      - backend
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: always
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    networks:
+      - backend
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    restart: always 
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./certs:/etc/nginx/certs 
+      - ./certs:/etc/nginx/ssl:ro
+    networks:
+      - backend
+    depends_on:
+      - cashflowcontrol.permissions.api
+      - cashflowcontrol.launchcontrol.api
+      - cashflowcontrol.dailyconsolidation.api
+      - cashflowcontrol.apigateway.api
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  portainer_data:

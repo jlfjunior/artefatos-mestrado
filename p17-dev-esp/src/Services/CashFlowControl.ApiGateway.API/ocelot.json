@@ -1,0 +1,130 @@
+{
+  "HttpHandlerOptions": {
+    "AllowAutoRedirect": true,
+    "UseCookieContainer": true
+  },
+  "GlobalConfiguration": {
+    "BaseUrl": "http://cashflowcontrol.apigateway.api:5230"
+  },
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/api/ConsolidatedBalance/{date}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "cashflowcontrol.dailyconsolidation.api",
+          "Port": 5043
+        }
+      ],
+      "UpstreamPathTemplate": "/api/ConsolidatedBalance/{date}",
+      "UpstreamHttpMethod": [ "Get" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Transaction",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "cashflowcontrol.launchcontrol.api",
+          "Port": 5166
+        }
+      ],
+      "UpstreamPathTemplate": "/api/Transaction",
+      "UpstreamHttpMethod": [ "Post" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Transaction",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "cashflowcontrol.launchcontrol.api",
+          "Port": 5166
+        }
+      ],
+      "UpstreamPathTemplate": "/api/Transaction",
+      "UpstreamHttpMethod": [ "Get" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Transaction/id/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "cashflowcontrol.launchcontrol.api",
+          "Port": 5166
+        }
+      ],
+      "UpstreamPathTemplate": "/api/Transaction/id/{id}",
+      "UpstreamHttpMethod": [ "Get" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/Transaction/date/{date}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "cashflowcontrol.launchcontrol.api",
+          "Port": 5166
+        }
+      ],
+      "UpstreamPathTemplate": "/api/Transaction/date/{date}",
+      "UpstreamHttpMethod": [ "Get" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/auth/register",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "cashflowcontrol.permissions.api",
+          "Port": 5290
+        }
+      ],
+      "UpstreamPathTemplate": "/api/auth/register",
+      "UpstreamHttpMethod": [ "Post" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/auth/login",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "cashflowcontrol.permissions.api",
+          "Port": 5290
+        }
+      ],
+      "UpstreamPathTemplate": "/api/auth/login",
+      "UpstreamHttpMethod": [ "Post" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/auth/refresh-token",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "cashflowcontrol.permissions.api",
+          "Port": 5290
+        }
+      ],
+      "UpstreamPathTemplate": "/api/auth/refresh-token",
+      "UpstreamHttpMethod": [ "Post" ]
+    }
+  ],
+  "SwaggerEndPoints": [
+    {
+      "Key": "Authenticate",
+      "Config": {
+        "Name": "API Authenticate",
+        "Url": "http://cashflowcontrol.permissions.api:5290/swagger/v1/swagger.json"
+      }
+    },
+    {
+      "Key": "dailyconsolidation",
+      "Config": {
+        "Name": "API Daily Consolidation",
+        "Url": "http://cashflowcontrol.dailyconsolidation.api:5043/swagger/v1/swagger.json"
+      }
+    },
+    {
+      "Key": "launchcontrol",
+      "Config": {
+        "Name": "API Launch Control",
+        "Url": "http://cashflowcontrol.launchcontrol.api:5166/swagger/v1/swagger.json"
+      }
+    }
+  ]
+}

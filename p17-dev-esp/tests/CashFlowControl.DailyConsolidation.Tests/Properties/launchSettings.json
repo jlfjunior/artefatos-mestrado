@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "CashFlowControl.DailyConsolidation.Tests": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}

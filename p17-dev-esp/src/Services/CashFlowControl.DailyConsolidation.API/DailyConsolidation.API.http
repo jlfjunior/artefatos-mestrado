@@ -1,0 +1,6 @@
+@DailyConsolidation.API_HostAddress = https://localhost:7047
+
+GET {{DailyConsolidation.API_HostAddress}}/api/ConsolidatedBalance/2025-03-05
+Accept: application/json
+
+###

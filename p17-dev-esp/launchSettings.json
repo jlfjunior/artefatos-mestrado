@@ -1,0 +1,14 @@
+{
+  "profiles": {
+    "Docker Compose": {
+      "commandName": "DockerCompose",
+      "commandVersion": "1.0",
+      "serviceActions": {
+        "cashflowcontrol.permissions.api": "StartDebugging",
+        "cashflowcontrol.launchcontrol.api": "StartDebugging",
+        "cashflowcontrol.dailyconsolidation.api": "StartDebugging",
+        "cashflowcontrol.apigateway.api": "StartDebugging"
+      }
+    }
+  }
+}

@@ -18,4 +18,6 @@
 | P14 | Desenvolvedor de Software | Senior | Rep |
 | P15 | Desenvolvedor de Software | Especialista | Rep |
 | P16 | Desenvolvedor de Software | Especialista | Ap |
-OBS: R434
+| P17 | Desenvolvedor de Software | Especialista | Ap |
+
+OBS: R426

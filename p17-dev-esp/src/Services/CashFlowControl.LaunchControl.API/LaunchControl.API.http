@@ -1,0 +1,37 @@
+@LaunchControl.API_HostAddress = https://localhost:7253
+
+### Criar uma Transação (Crédito)
+POST {{LaunchControl.API_HostAddress}}/api/Transaction/
+Content-Type: application/json
+
+{
+  "amount": 100,
+  "type": "Credit"
+}
+
+###
+
+### Criar uma Transação (Débito)
+POST {{LaunchControl.API_HostAddress}}/api/Transaction/
+Content-Type: application/json
+
+{
+  "amount": 50,
+  "type": "Debit"
+}
+
+###
+
+### Buscar Todas as Transações
+GET {{LaunchControl.API_HostAddress}}/api/Transaction/
+Accept: application/json
+
+###
+
+### Buscar uma Transação por ID (Substitua {id} pelo ID real)
+GET {{LaunchControl.API_HostAddress}}/api/Transaction/id/{id}
+Accept: application/json
+
+### Buscar uma Transação por data
+GET {{LaunchControl.API_HostAddress}}/api/Transaction/date/{date}
+Accept: application/json
