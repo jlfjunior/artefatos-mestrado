@@ -15,4 +15,5 @@
 | P11 | Arquiteto de Software | Pleno | Ap |
 | P12 | Desenvolvedor de Software | Pleno | Rep |
 | P13 | Desenvolvedor de Software | Senior | Rep |
+| P14 | Desenvolvedor de Software | Senior | Rep |
 OBS: R466
