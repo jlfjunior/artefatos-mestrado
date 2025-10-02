@@ -21,4 +21,5 @@
 | P17 | Desenvolvedor de Software | Especialista | Ap |
 | P18 | Desenvolvedor de Software | Junior | Ap |
 | P19 | Desenvolvedor de Software | Pleno | Ap |
-OBS: R419
+| P20 | Desenvolvedor de Software | Pleno | Ap |
+OBS: R418
