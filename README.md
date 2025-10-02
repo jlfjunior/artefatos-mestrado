@@ -20,4 +20,5 @@
 | P16 | Desenvolvedor de Software | Especialista | Ap |
 | P17 | Desenvolvedor de Software | Especialista | Ap |
 | P18 | Desenvolvedor de Software | Junior | Ap |
-OBS: R423
+| P19 | Desenvolvedor de Software | Pleno | Ap |
+OBS: R419
