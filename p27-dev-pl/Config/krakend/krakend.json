@@ -1,0 +1,79 @@
+{
+  "$schema": "https://www.krakend.io/schema/v3.json",
+  "version": 3,
+  "name": "KrakenD Enterprise API Gateway",
+  "port": 8080,
+  "host": [ "http://fake_api:8080" ],
+  "timeout": "3000ms",
+  "cache_ttl": "300s",
+  "endpoints": [
+    {
+      "@comment": "Consolidate Api",
+      "endpoint": "/api/consolidate",
+      "input_query_strings": [
+        "Date"
+      ],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "RS256",
+          "jwk_url": "http://keycloak:8080/auth/realms/follow_the_money/protocol/openid-connect/certs",
+          "disable_jwk_security": true,
+          "operation_debug": true
+        }
+      },
+      "backend": [
+        {
+          "host": [ "http://consolidate-api" ],
+          "url_pattern": "/consolidate",
+          "encoding": "safejson"
+        }
+      ]
+    },
+    {
+      "@comment": "Consolidate Api",
+      "endpoint": "/getToken",
+      "method": "POST",
+      "backend": [
+        {
+          "host": [ "http://consolidate-api" ],
+          "url_pattern": "/security/getToken",
+          "encoding": "safejson"
+        }
+      ]
+    },
+    {
+      "@comment": "Transaction Api",
+      "endpoint": "/api/transaction/add",
+      "extra_config": {
+        "auth/validator": {
+          "alg": "RS256",
+          "jwk_url": "http://keycloak:8080/auth/realms/follow_the_money/protocol/openid-connect/certs",
+          "disable_jwk_security": true,
+          "operation_debug": true
+        }
+      },
+      "output_encoding": "no-op",
+      "method": "POST",
+      "backend": [
+        {
+          "host": [ "http://transactions-api" ],
+          "url_pattern": "/transaction/add",
+          "encoding": "no-op"
+        }
+      ]
+    }
+  ],
+  "extra_config": {
+    "telemetry/opencensus": {
+      "sample_rate": 100,
+      "reporting_period": 0,
+      "exporters": {
+        "jaeger": {
+          "endpoint": "http://jaeger-trace:14268/api/traces",
+          "service_name": "Api.Gateway",
+          "buffer_max_count": 1000
+        }
+      }
+    }
+  }
+}

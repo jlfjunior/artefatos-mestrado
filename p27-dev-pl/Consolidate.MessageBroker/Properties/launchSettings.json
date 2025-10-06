@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Consolidate.MessageBroker": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}

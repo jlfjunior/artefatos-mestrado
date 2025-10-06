@@ -1,0 +1,109 @@
+version: '3.4'
+
+services:
+  krakend_ce:
+    # The :watch image restarts the service automatically when the configuration files change.
+    # Do not use this image in production, it's meant to speed up your testing and development.
+    image: devopsfaith/krakend:watch
+    container_name: 'apy-gateway'
+    volumes:
+      - ./Config/krakend:/etc/krakend
+    ports:
+      - "1234:1234"
+      - "8080:8080"
+      - "8090:8090"
+    command: ["run", "-d", "-c", "/etc/krakend/krakend.json"]
+  consolidate.api:
+    image: ${DOCKER_REGISTRY-}consolidateapi
+    container_name: 'consolidate-api'
+    build:
+      context: .
+      dockerfile: Consolidate.Api/Dockerfile
+
+  transactions.api:
+    image: ${DOCKER_REGISTRY-}transactionsapi
+    container_name: 'transactions-api'
+    build:
+      context: .
+      dockerfile: Transactions.Api/Dockerfile
+
+  rabbitmq:
+    image: rabbitmq:3.8-management-alpine
+    container_name: 'rabbitmq2'
+    ports:
+      - 5672:5672
+      - 15672:15672
+
+  mongodb:
+    image: mongo
+    container_name: 'mongodb-consolidate'
+    restart: always
+    ports:
+        - 27017:27017
+    environment:
+        - MONGO_INITDB_ROOT_USERNAME=admin
+        - MONGO_INITDB_ROOT_PASSWORD=secretpassword
+    volumes:
+        - mongodb_data:/data/db
+  jaeger: 
+    image: jaegertracing/all-in-one:latest
+    container_name: 'jaeger-trace'
+    ports:
+        - "5775:5775/udp"
+        - "6831:6831/udp"
+        - "6832:6832/udp"
+        - "5778:5778"
+        - "16686:16686"
+        - "14268:14268"
+        - "9411:9411"
+  
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.11.1
+    container_name: 'elasticsearch-log'
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+
+    environment:
+      discovery.type: single-node
+      ES_JAVA_OPTS: "-Xms1g -Xmx1g"
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.11.1
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+
+  postgres:
+    image: postgres
+    volumes:
+        - postgres_data:/var/lib/postgresql/data
+    environment:
+        POSTGRES_DB: keycloak
+        POSTGRES_USER: keycloak
+        POSTGRES_PASSWORD: password
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:legacy
+    container_name: 'keycloak'
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: postgres
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_SCHEMA: public
+      DB_PASSWORD: password
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: Pa55w0rd
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - 8093:8080
+    depends_on:
+      - postgres
+
+volumes:
+  mongodb_data:
+  postgres_data:
+    driver: local
+    

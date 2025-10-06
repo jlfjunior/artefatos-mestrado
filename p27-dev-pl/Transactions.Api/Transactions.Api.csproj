@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>4cfbfc71-b42c-4c9a-847b-615c88f339e4</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+    <PackageReference Include="EntityFramework" Version="6.4.4" />
+    <PackageReference Include="Jaeger" Version="1.0.3" />
+    <PackageReference Include="MassTransit.RabbitMQ" Version="8.0.16" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0-preview.4.23259.3" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.2" />
+    <PackageReference Include="OpenTelemetry" Version="1.5.0" />
+    <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.5.0" />
+    <PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="1.5.0" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.5.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.5.0-beta.1" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.0.0-beta.7" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.5.0-beta.1" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.MassTransit" Version="1.0.0-beta.3" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.SqlClient" Version="1.5.0-beta.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Extensions\Extensions.csproj" />
+    <ProjectReference Include="..\Transactions.Business\Transactions.Business.csproj" />
+    <ProjectReference Include="..\Transactions.Data\Transactions.Data.csproj" />
+  </ItemGroup>
+
+</Project>

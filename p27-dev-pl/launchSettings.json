@@ -1,0 +1,14 @@
+{
+  "profiles": {
+    "Docker Compose": {
+      "commandName": "DockerCompose",
+      "commandVersion": "1.0",
+      "serviceActions": {
+        "consolidate.api": "StartDebugging",
+        "transactions.api": "StartDebugging",
+        "consolidate.messagebroker": "StartDebugging",
+        "followthemoney.apigateway": "StartDebugging"
+      }
+    }
+  }
+}

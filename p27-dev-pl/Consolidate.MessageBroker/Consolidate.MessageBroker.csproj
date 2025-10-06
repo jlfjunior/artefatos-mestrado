@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="12.0.1" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+    <PackageReference Include="MassTransit.RabbitMQ" Version="8.0.16" />
+    <PackageReference Include="MediatR" Version="12.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.2" />
+    <PackageReference Include="MongoDB.Driver" Version="2.19.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Consolidate.Business\Consolidate.Business.csproj" />
+    <ProjectReference Include="..\Consolidate.Data\Consolidate.Data.csproj" />
+    <ProjectReference Include="..\Transactions.Business\Transactions.Business.csproj" />
+  </ItemGroup>
+
+</Project>

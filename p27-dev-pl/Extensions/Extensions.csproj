@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AspNetCore.HealthChecks.MongoDb" Version="6.0.2" />
+    <PackageReference Include="AspNetCore.HealthChecks.Prometheus.Metrics" Version="6.0.2" />
+    <PackageReference Include="AspNetCore.HealthChecks.Publisher.Prometheus" Version="6.0.2" />
+    <PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" Version="6.0.2" />
+    <PackageReference Include="Elastic.CommonSchema.Serilog" Version="8.6.0" />
+    <PackageReference Include="MassTransit" Version="8.0.16" />
+    <PackageReference Include="MediatR" Version="12.0.1" />
+    <PackageReference Include="MediatR.Contracts" Version="2.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.16" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="7.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
+    <PackageReference Include="Microsoft.OpenApi" Version="1.6.4" />
+    <PackageReference Include="MongoDB.Driver" Version="2.19.2" />
+    <PackageReference Include="MongoDB.Driver.Core.Extensions.OpenTelemetry" Version="1.0.0" />
+    <PackageReference Include="OpenTelemetry" Version="1.5.0" />
+    <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.5.0" />
+    <PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="1.5.0" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.5.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.5.0-beta.1" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.0.0-beta.7" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.5.0-beta.1" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.MassTransit" Version="1.0.0-beta.3" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.SqlClient" Version="1.5.0-beta.1" />
+    <PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
+    <PackageReference Include="Serilog.Enrichers.Environment" Version="2.3.0-dev-00793" />
+    <PackageReference Include="Serilog.Exceptions" Version="8.4.0" />
+    <PackageReference Include="Serilog.Sinks.Elasticsearch" Version="9.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Foundation\Foundation.csproj" />
+  </ItemGroup>
+</Project>
