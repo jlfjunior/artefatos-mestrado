@@ -28,4 +28,4 @@
 | P24 | Arquiteto de Software | Senior | Ap |
 | P25 | Arquiteto de Software | Senior | Ap |
 
-OBS: R341
+OBS: R324
