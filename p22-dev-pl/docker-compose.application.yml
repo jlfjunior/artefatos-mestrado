@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  authapi:
+    container_name: bcash_auth_api
+    build:
+      context: ./src/BCash.AuthApi
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8080"
+    networks:
+      - bcash-network
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+
+  transactionapi:
+    container_name: bcash_transaction_api
+    build:
+      context: .
+      dockerfile: ./src/BCash.TransactionApi/Dockerfile
+    ports:
+      - "8082:8080"
+    networks:
+      - bcash-network
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+
+  reportapi:
+    container_name: bcash_report_api
+    build:
+      context: .
+      dockerfile: ./src/BCash.ReportApi/Dockerfile
+    ports:
+      - "8083:8080"
+    networks:
+      - bcash-network
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+
+networks:
+  bcash-network:
+    name: bcash-network
+    driver: bridge
+    external: true

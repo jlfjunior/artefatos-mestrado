@@ -1,0 +1,31 @@
+version: "3.8"
+services:
+  sql:
+    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    container_name: sql_server2022
+    environment:
+      - ACCEPT_EULA=y
+      - SA_PASSWORD=mdTx8zYc1M/2
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    networks:
+      - bcash-network
+
+  redis:
+    image: redis
+    command: redis-server --requirepass 123Abc@@!
+    ports:
+      - "6379:6379"
+    networks:
+      - bcash-network
+
+volumes:
+  sqlserver_data:
+    name: bcash-sqlserver_data
+
+networks:
+  bcash-network:
+    name: bcash-network
+    driver: bridge

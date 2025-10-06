@@ -1,0 +1,21 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS migration
+WORKDIR /app
+
+COPY src/BCash.Domain/BCash.Domain.csproj ./BCash.Domain/
+COPY src/BCash.Infrastructure/BCash.Infrastructure.csproj ./BCash.Infrastructure/
+COPY src/BCash.Service/BCash.Service.csproj ./BCash.BCash.Service/
+COPY src/BCash.TransactionApi/BCash.TransactionApi.csproj ./BCash.TransactionApi/
+
+RUN dotnet restore ./BCash.TransactionApi/BCash.TransactionApi.csproj
+
+COPY src/BCash.Domain/ ./BCash.Domain/
+COPY src/BCash.Infrastructure/ ./BCash.Infrastructure/
+COPY src/BCash.Service/ ./BCash.Service/
+COPY src/BCash.TransactionApi/ ./BCash.TransactionApi/
+
+RUN dotnet tool install --global dotnet-ef
+ENV PATH="${PATH}:/root/.dotnet/tools"
+
+ENV ASPNETCORE_ENVIRONMENT="Production"
+
+CMD ["dotnet", "ef", "database", "update", "--project", "BCash.Infrastructure/BCash.Infrastructure.csproj", "--startup-project", "BCash.TransactionApi/BCash.TransactionApi.csproj"]

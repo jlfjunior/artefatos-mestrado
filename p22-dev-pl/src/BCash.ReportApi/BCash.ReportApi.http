@@ -1,0 +1,6 @@
+@BCash.ReportApi_HostAddress = http://localhost:5260
+
+GET {{BCash.ReportApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

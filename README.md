@@ -23,4 +23,6 @@
 | P19 | Desenvolvedor de Software | Pleno | Ap |
 | P20 | Desenvolvedor de Software | Pleno | Ap |
 | P21 | Desenvolvedor de Software | Senior | Rep |
-OBS: R413 
+| P22 | Desenvolvedor de Software | Pleno | Ap |
+
+OBS: R411 
