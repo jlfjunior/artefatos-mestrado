@@ -1,0 +1,17 @@
+include:
+  - ./docker-compose.yml
+
+services:
+  load-tests:
+    container_name: merchant-accounting-system-load-tests
+    image: grafana/k6:latest
+    ports:
+      - "6565:6565"
+    command: run /scripts/index.js
+    volumes:
+      - ./load-tests:/scripts
+    depends_on:
+      api-gateway:
+        condition: service_healthy
+      simple-auth-api:
+        condition: service_healthy

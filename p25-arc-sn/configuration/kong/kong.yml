@@ -1,0 +1,61 @@
+_format_version: "3.0"
+_transform: true
+
+services:
+  - name: accounting-operations-debit
+    host: accounting-operations-api
+    port: 8080
+    protocol: http
+    path: /v1/operations/debit
+
+  - name: accounting-operations-credit
+    host: accounting-operations-api
+    port: 8080
+    protocol: http
+    path: /v1/operations/credit
+
+  - name: daily-balances-api-balance
+    host: daily-balances-api
+    port: 8080
+    protocol: http
+    path: /v1/balances
+
+routes:
+  - name: debit
+    service: accounting-operations-debit
+    paths:
+      - /debit
+    plugins:
+      - name: jwt
+
+  - name: credit
+    service: accounting-operations-credit
+    paths:
+      - /credit
+    plugins:
+      - name: jwt
+
+  - name: balance
+    service: daily-balances-api-balance
+    paths:
+      - /balance
+    plugins:
+      - name: jwt
+
+plugins:
+  - name: correlation-id
+    enabled: true
+    config:
+      header_name: Correlation-Id
+      generator: uuid#counter
+      echo_downstream: true
+
+  - name: jwt
+    enabled: true
+
+consumers:
+  - username: apigatewayuser
+
+jwt_secrets:
+  - consumer: apigatewayuser
+    secret: SZfI0j8zz7UtJSbIqfDhPaBEX4d8bWDo
