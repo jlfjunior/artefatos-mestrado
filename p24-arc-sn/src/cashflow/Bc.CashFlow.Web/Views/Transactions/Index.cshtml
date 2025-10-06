@@ -1,0 +1,48 @@
+@using Bc.CashFlow.Domain.Transaction
+@model Bc.CashFlow.Web.Models.Transaction.TransactionIndexViewModel
+@{
+    ViewData["Title"] = "Transações";
+}
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+<p>Página de gestão de transações</p>
+
+<div class="table-responsive">
+    <table class="table table-striped table-bordered">
+        <thead class="table-light">
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Account</th>
+            <th scope="col">Type</th>
+            <th scope="col" class="text-end">Amount</th>
+            <th scope="col" class="text-end">Fee</th>
+            <th scope="col" class="text-end">Date</th>
+            <th scope="col" class="text-end">Repayment</th>
+            <td></td>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (ITransaction transaction in Model.TransactionsList)
+        {
+            <tr data-transaction-id="@transaction.Id">
+                <td>@transaction.Id</td>
+                <td>@transaction.AccountId</td>
+                <td>@transaction.TransactionType</td>
+                <td class="text-end font-monospace">@($"{transaction.Amount:C2}")</td>
+                <td class="text-end font-monospace">@($"{transaction.TransactionFee:C2}")</td>
+                <td class="text-end font-monospace">@($"{transaction.TransactionDate:yyyy-MM-dd HH:mm:ss}")</td>
+                <td class="text-end font-monospace">@($"{transaction.ProjectedRepaymentDate:yyyy-MM-dd HH:mm:ss}")</td>
+                <td class="text-end">
+                    <a asp-controller="Transactions" asp-action="Details" asp-route-id="@transaction.Id" class="btn btn-info">
+                        Ver Detalhes
+                    </a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+<div class="d-flex justify-content-end">
+    <a asp-controller="Transactions" asp-action="Create" class="btn btn-primary">Nova transação</a>
+</div>

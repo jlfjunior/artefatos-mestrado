@@ -1,0 +1,24 @@
+@model Bc.CashFlow.Web.Models.User.UserDetailsViewModel
+@{
+    ViewData["Title"] = "Usuários";
+}
+<h1>@ViewData["Title"]</h1>
+
+<p>Página de gestão de usuários</p>
+
+<div class="card">
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">ID</dt>
+            <dd class="col-sm-9">@Model.User.Id</dd>
+
+            <dt class="col-sm-3">Username</dt>
+            <dd class="col-sm-9">@Model.User.Username</dd>
+
+            <dt class="col-sm-3">Created at</dt>
+            <dd class="col-sm-9">@($"{Model.User.CreatedAt:yyyy-MM-dd HH:mm:ss}")</dd>
+        </dl>
+
+        <a asp-controller="Users" asp-action="Index" class="btn btn-secondary mt-4">Lista de usuários</a>
+    </div>
+</div>

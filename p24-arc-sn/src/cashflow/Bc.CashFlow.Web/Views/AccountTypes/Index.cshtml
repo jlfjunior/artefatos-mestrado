@@ -1,0 +1,32 @@
+@using Bc.CashFlow.Domain.AccountType
+@model Bc.CashFlow.Web.Models.AccountType.AccountTypeIndexViewModel
+@{
+    ViewData["Title"] = "Tipos de Conta";
+}
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+<p>Página de gestão de tipos de conta</p>
+
+<div class="table-responsive">
+    <table class="table table-striped table-bordered">
+        <thead class="table-light">
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Name</th>
+            <th scope="col" class="text-end">Fee (%)</th>
+            <th scope="col" class="text-end">Due Days</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (IAccountType accountType in Model.AccountTypesList)
+        {
+            <tr data-account-type-id="@accountType.Id">
+                <td>@accountType.Id</td>
+                <td>@accountType.Name</td>
+                <td class="text-end font-monospace">@($"{accountType.BaseFee:F2}")</td>
+                <td class="text-end font-monospace">@($"D+{accountType.PaymentDueDays:D2}")</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Hangfire.NetCore" Version="1.8.14"/>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.2"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2"/>
+        <PackageReference Include="RabbitMQ.Client" Version="6.8.1"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Bc.CashFlow.Business\Bc.CashFlow.Business.csproj"/>
+        <ProjectReference Include="..\Bc.CashFlow.Domain\Bc.CashFlow.Domain.csproj"/>
+        <ProjectReference Include="..\Bc.CashFlow.IO\Bc.CashFlow.IO.csproj"/>
+        <ProjectReference Include="..\Bc.CashFlow.Services\Bc.CashFlow.Services.csproj"/>
+    </ItemGroup>
+
+</Project>

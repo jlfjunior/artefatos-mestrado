@@ -1,0 +1,73 @@
+@startuml
+
+!include defaults.plantuml
+
+title Entity-Relationship Model
+
+entity "tbl_User" as tblUser {
+    * UserId : INT <<PK>>
+    --
+    * Username : VARCHAR
+    * PasswordSalt : VARCHAR
+    * PasswordHash : VARCHAR
+    * CreatedAt : DATETIME
+}
+
+entity "tbl_AccountType" as tblAccountType {
+    * AccountTypeId : INT <<PK>>
+    * AccountTypeName : VARCHAR
+    --
+    + BaseFee : DECIMAL
+    + PaymentDueDays : INT
+}
+
+entity "tbl_Account" as tblAccount {
+    * AccountId : INT <<PK>>
+    + UserId : INT <<FK>>
+    * AccountName : VARCHAR
+    * AccountTypeId : INT <<FK>>
+    --
+    * InitialBalance : DECIMAL
+    + CurrentBalance : DECIMAL
+    + BalanceUpdatedAt : DATETIME
+    * CreatedAt : DATETIME
+}
+
+entity "tbl_Transaction" as tblTransaction {
+    * TransactionId : INT <<PK>>
+    * UserId : INT <<FK>>
+    * AccountId : INT <<FK>>
+    * TransactionType : BIT
+    * Amount : DECIMAL
+    --
+    + Description : VARCHAR
+    * TransactionDate : DATETIME
+    + TransactionFee : Decimal
+    + ProjectedRepaymentDate : DATETIME
+}
+
+entity "tbl_DailyReport" as tblDailyReport {
+    * ReportId : INT <<PK>>
+    + UserId : INT <<FK>>
+    * ReportDate : DATETIME
+    --
+    * TotalDebits : DECIMAL
+    * TotalCredits : DECIMAL
+    * TotalFee : DECIMAL
+    * Balance : DECIMAL
+}
+
+entity "vw_TransactionType" as vwTransactionType {
+    * TransactionType : BIT <<FK>>
+    --
+    + TransactionTypeDescription : VARCHAR
+}
+
+tblUser ||--o{ tblTransaction
+tblUser ||--o{ tblAccount
+tblAccountType ||--o{ tblAccount
+tblAccount ||--o{ tblTransaction
+tblUser ||--o{ tblDailyReport
+tblTransaction ||-- vwTransactionType
+
+@enduml

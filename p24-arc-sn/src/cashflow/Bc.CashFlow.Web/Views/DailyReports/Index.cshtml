@@ -1,0 +1,42 @@
+@using Bc.CashFlow.Domain.DailyReport
+@model Bc.CashFlow.Web.Models.DailyReport.DailyReportIndexViewModel
+@{
+    ViewData["Title"] = "Relatórios diários";
+}
+<h1>@ViewData["Title"]</h1>
+
+<p>Página de gestão de relatórios diários</p>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>Id</th>
+        <th>AccountId</th>
+        <th>Date</th>
+        <th>Total Debits</th>
+        <th>Total Credits</th>
+        <th>Total Fee</th>
+        <th>Balance</th>
+        <th>Created At</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (IDailyReport dailyReport in Model.DailyReportsList)
+    {
+        <tr>
+            <td>@dailyReport.Id</td>
+            <td>@dailyReport.AccountId</td>
+            <td>@($"{dailyReport.Date:yyyy-MM-dd}")</td>
+            <td>@($"{dailyReport.TotalDebits:C2}")</td>
+            <td>@($"{dailyReport.TotalCredits:C2}")</td>
+            <td>@($"{dailyReport.TotalFee:C2}")</td>
+            <td>@($"{dailyReport.Balance:C2}")</td>
+            <td>@($"{dailyReport.CreatedAt:yyyy-MM-dd HH:mm:ss}")</td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<div class="d-flex justify-content-end">
+    <a asp-controller="DailyReports" asp-action="Create" class="btn btn-primary">Novo relatório</a>
+</div>

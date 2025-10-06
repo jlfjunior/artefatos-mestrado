@@ -1,0 +1,43 @@
+services:
+  
+  cashflow-app:
+    extends:
+      file: 'docker-compose.bccf.yaml'
+      service: '_service'
+    build:
+      context: '..'
+      dockerfile: './iac/cashflow-app/Dockerfile'
+    container_name: 'cashflow-sandbox'
+    hostname: 'cashflow-sandbox'
+    environment:
+      ASPNETCORE_ENVIRONMENT: 'Production'
+      EVOLVE_VERSION: '3.2.0'
+      HOLD_OFF_TIME: '5'
+      DB_HOSTNAME: 'cashflow-db'
+      DB_PORT: '1433'
+      CACHE_HOSTNAME: 'cashflow-cache'
+      CACHE_PORT: '6379'
+      QUEUE_HOSTNAME: 'cashflow-queue'
+      QUEUE_PORT: '5672'
+      DB_MASTER_SA_CONNECTION_STRING: 'Server=cashflow-db;Database=master;UID=sa;PWD=${CASHFLOW_DB_SU_PWD}'
+      DB_MASTER_SA_LOCATION: '/db/migrations/master-sa'
+      DB_BCCF_SA_CONNECTION_STRING: 'Server=cashflow-db;Database=BCCF;UID=sa;PWD=${CASHFLOW_DB_SU_PWD}'
+      DB_BCCF_SA_LOCATION: '/db/migrations/bccf-sa'
+      DB_BCCF_USER_LOGIN: '${CASHFLOW_DB_USERNAME}'
+      DB_BCCF_USER_PASSWORD: '${CASHFLOW_DB_PASSWORD}'
+      DB_HANGFIRE_SA_CONNECTION_STRING: 'Server=cashflow-db;Database=Hangfire;UID=sa;PWD=${CASHFLOW_DB_SU_PWD}'
+      DB_HANGFIRE_SA_LOCATION: '/db/migrations/hangfire-sa'
+      DB_HANGFIRE_USER_LOGIN: '${HANGFIRE_DB_USERNAME}'
+      DB_HANGFIRE_USER_PASSWORD: '${HANGFIRE_DB_PASSWORD}'
+      DB_CASHFLOW_CONNECTION_STRING: 'Server=cashflow-db;Database=BCCF;UID=${CASHFLOW_DB_USERNAME};PWD=${CASHFLOW_DB_PASSWORD}'
+      DB_CASHFLOW_LOCATION: '/db/migrations/cashflow'
+    volumes:
+      - './.aspnet/DataProtection-Keys:/root/.aspnet/DataProtection-Keys'
+      - './migrations/master-sa:/db/migrations/master-sa:ro'
+      - './migrations/bccf-sa:/db/migrations/bccf-sa:ro'
+      - './migrations/hangfire-sa:/db/migrations/hangfire-sa:ro'
+      - '../db/migrations:/db/migrations/cashflow:ro'
+    networks:
+      cashflow-db:
+      cashflow-cache:
+      cashflow-queue:

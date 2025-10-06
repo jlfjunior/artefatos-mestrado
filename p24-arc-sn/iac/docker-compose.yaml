@@ -1,0 +1,120 @@
+name: 'bc-cashflow'
+
+services:
+
+  cashflow-db:
+    extends:
+      file: 'docker-compose.bccf.yaml'
+      service: '_service'
+    image: 'mcr.microsoft.com/mssql/server:latest'
+    container_name: 'cashflow-db'
+    hostname: 'cashflow-db'
+    environment:
+      ACCEPT_EULA: 'Y'
+      MSSQL_SA_PASSWORD: '$CASHFLOW_DB_SU_PWD'
+      MSSQL_PID: '$MSSQL_PID'
+    volumes:
+      - 'cashflow-db:/var/opt/mssql'
+    ports:
+      - '1433:1433'
+    networks:
+      cashflow-db:
+      cashflow-db-migration:
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: '1536M'
+
+  cashflow-cache:
+    extends:
+      file: 'docker-compose.bccf.yaml'
+      service: '_service'
+    image: 'eqalpha/keydb:latest'
+    container_name: 'cashflow-cache'
+    hostname: 'cashflow-cache'
+    ports:
+      - '6379:6379'
+    networks:
+      cashflow-cache:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.6'
+          memory: '64M'
+
+  cashflow-queue:
+    extends:
+      file: 'docker-compose.bccf.yaml'
+      service: '_service'
+    image: 'rabbitmq:management'
+    container_name: 'cashflow-queue'
+    hostname: 'cashflow-queue'
+    environment:
+      RABBITMQ_DEFAULT_USER: '${RABBITMQ_DEFAULT_USER}'
+      RABBITMQ_DEFAULT_PASS: '${RABBITMQ_DEFAULT_PASS}'
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    networks:
+      cashflow-queue:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: '128M'
+
+  cashflow-web:
+    extends:
+      file: 'docker-compose.cashflow.yaml'
+      service: 'cashflow-app'
+    container_name: 'cashflow-web'
+    hostname: 'cashflow-web'
+    environment:
+      CASHFLOW_APP: 'WEB'
+      HTTP_PORT: '8080'
+    ports:
+      - '5380:8080'
+    networks:
+      cashflow-web:
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: '256M'
+
+  cashflow-scheduler:
+    extends:
+      file: 'docker-compose.cashflow.yaml'
+      service: 'cashflow-app'
+    container_name: 'cashflow-scheduler'
+    hostname: 'cashflow-scheduler'
+    environment:
+      CASHFLOW_APP: 'SCHEDULER'
+      HTTP_PORT: '8080'
+    ports:
+      - '5381:8080'
+    networks:
+      cashflow-scheduler:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: '128M'
+
+networks:
+  cashflow-db:
+    driver: bridge
+  cashflow-db-migration:
+    driver: bridge
+  cashflow-cache:
+    driver: bridge
+  cashflow-queue:
+    driver: bridge
+  cashflow-web:
+    driver: bridge
+  cashflow-scheduler:
+    driver: bridge
+
+volumes:
+  cashflow-db:

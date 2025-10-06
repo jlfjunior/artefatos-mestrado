@@ -1,0 +1,18 @@
+services:
+
+  _service:
+    restart: '$BCCF_RESTARTPOLICY'
+    dns:
+      - '$BCCF_DNS_PRIMARY'
+      - '$BCCF_DNS_SECONDARY'
+    security_opt:
+      - '$BCCF_SECOPT'
+    environment:
+      PUID: '$BCCF_PUID'
+      PGID: '$BCCF_PGID'
+      TZ: '$BCCF_TZ'
+    volumes:
+      - '/etc/localtime:/etc/localtime:ro'
+      - '/var/run/docker.sock:/var/run/docker.sock:ro'
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'

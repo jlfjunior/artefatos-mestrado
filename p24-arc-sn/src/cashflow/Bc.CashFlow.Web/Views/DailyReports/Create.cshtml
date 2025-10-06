@@ -1,0 +1,17 @@
+@model Bc.CashFlow.Web.Models.DailyReport.DailyReportCreateViewModel
+@{
+    ViewData["Title"] = "Criar Transação";
+}
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+<p>Página para criação de novo relatório diário</p>
+
+<form asp-action="Create">
+
+    <div class="mb-3">
+        <label for="reference-date" class="form-label">Data de Referência</label>
+        <input id="reference-date" name="reference-date" type="date" class="form-control"/>
+    </div>
+
+    <button type="submit" class="btn btn-success">Salvar</button>
+</form>

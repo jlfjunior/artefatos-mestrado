@@ -25,5 +25,6 @@
 | P21 | Desenvolvedor de Software | Senior | Rep |
 | P22 | Desenvolvedor de Software | Pleno | Ap |
 | P23 | Desenvolvedor de Software | Pleno | Ap |
+| P24 | Arquiteto de Software | Senior | Ap |
 
-OBS: R408 
+OBS: R366 

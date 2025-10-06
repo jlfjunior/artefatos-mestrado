@@ -1,0 +1,42 @@
+@model Bc.CashFlow.Web.Models.Transaction.TransactionDetailsViewModel
+@{
+    ViewData["Title"] = "Transação";
+}
+<h1>@ViewData["Title"]</h1>
+
+<p>Página de gestão de transação</p>
+
+<div class="card">
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">ID</dt>
+            <dd class="col-sm-9">@Model.Transaction.Id</dd>
+
+            <dt class="col-sm-3">User</dt>
+            <dd class="col-sm-9">@Model.User?.Username</dd>
+
+            <dt class="col-sm-3">Account ID</dt>
+            <dd class="col-sm-9">@Model.Transaction.AccountId</dd>
+
+            <dt class="col-sm-3">Description</dt>
+            <dd class="col-sm-9">@Model.Transaction.Description</dd>
+
+            <dt class="col-sm-3">TransactionType</dt>
+            <dd class="col-sm-9">@Model.Transaction.TransactionType</dd>
+
+            <dt class="col-sm-3">Amount</dt>
+            <dd class="col-sm-9">@Model.Transaction.Amount</dd>
+
+            <dt class="col-sm-3">Fee</dt>
+            <dd class="col-sm-9">@Model.Transaction.TransactionFee</dd>
+
+            <dt class="col-sm-3">Transaction date</dt>
+            <dd class="col-sm-9">@($"{Model.Transaction.TransactionDate:yyyy-MM-dd HH:mm:ss}")</dd>
+
+            <dt class="col-sm-3">Projected repayment date</dt>
+            <dd class="col-sm-9">@($"{Model.Transaction.ProjectedRepaymentDate:yyyy-MM-dd HH:mm:ss}")</dd>
+        </dl>
+
+        <a asp-controller="Transactions" asp-action="Index" class="btn btn-secondary mt-4">Lista de transações</a>
+    </div>
+</div>

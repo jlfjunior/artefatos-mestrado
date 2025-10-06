@@ -1,0 +1,40 @@
+@model Bc.CashFlow.Web.Models.Transaction.TransactionCreateViewModel
+@{
+    ViewData["Title"] = "Criar Transação";
+}
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+<p>Página para criação de nova transação</p>
+
+<form asp-action="Create">
+    <div class="mb-3">
+        <label for="account-id" class="form-label">Conta</label>
+        <select id="account-id" name="account-id" class="form-select">
+            <option value="" selected="selected">Selecione uma conta</option>
+            @foreach (SelectListItem item in Model.AccountsList!)
+            {
+                <option value="@item.Value">@item.Text</option>
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="transaction-type" class="form-label">Tipo de Transação</label>
+        <select id="transaction-type" name="transaction-type" class="form-select">
+            <option value="1" selected="selected">Crédito</option>
+            <option value="0">Débito</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="amount" class="form-label">Valor</label>
+        <input id="amount" name="amount" class="form-control"/>
+    </div>
+
+    <div class="mb-3">
+        <label for="description" class="form-label">Descrição</label>
+        <textarea id="description" id="name" class="form-control"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-success">Salvar</button>
+</form>

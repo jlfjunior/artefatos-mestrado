@@ -1,0 +1,38 @@
+@startuml
+
+!include defaults.plantuml
+
+title Environment Build Workflow Diagram
+
+start
+fork
+:Start SQL Server;
+fork again
+:Start KeyDB;
+fork again
+:Start RabbitMQ;
+end fork
+fork
+:Start Cash Flow\nWeb;
+:Wait for SQL Server;
+:Hold off a bit;
+:Create databases;
+:Create BCCF user;
+fork again
+:Start Cash Flow\nScheduler;
+:Wait for SQL Server;
+:Hold off a bit;
+:Create databases;
+:Create Hangfire user;
+end fork
+:Migrate BCCF database;
+:Wait for KeyDB;
+:Wait for RabbitMQ;
+fork
+:Run Cash Flow\nWeb;
+fork again
+:Run Cash Flow\nScheduler;
+end fork
+end
+
+@enduml
