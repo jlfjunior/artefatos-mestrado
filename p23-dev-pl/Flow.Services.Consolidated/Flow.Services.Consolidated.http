@@ -1,0 +1,6 @@
+@Flow.Services.Consolidated_HostAddress = http://localhost:5237
+
+GET {{Flow.Services.Consolidated_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

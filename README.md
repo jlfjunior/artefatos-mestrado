@@ -24,5 +24,6 @@
 | P20 | Desenvolvedor de Software | Pleno | Ap |
 | P21 | Desenvolvedor de Software | Senior | Rep |
 | P22 | Desenvolvedor de Software | Pleno | Ap |
+| P23 | Desenvolvedor de Software | Pleno | Ap |
 
-OBS: R411 
+OBS: R408 
