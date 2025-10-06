@@ -31,4 +31,4 @@
 | P27 | Desenvolvedor de Software | Pleno | Rep |
 | P28 | Arquiteto de Software | Pleno | Ap |
 
-OBS: R251
+OBS: R243
