@@ -1,0 +1,62 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CashFlow.Domain", "src\CashFlow.Domain\CashFlow.Domain.csproj", "{7281AB1E-FCE8-432C-BB04-161DB567E319}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CashFlow.Application", "src\CashFlow.Application\CashFlow.Application.csproj", "{5E998133-B7FD-4F8F-AEDD-966AF203D3CD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CashFlow.UnitTest", "test\CashFlow.UnitTest\CashFlow.UnitTest.csproj", "{ACB3B04F-FF15-4572-A4FF-E4A196EBCBD5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CashFlow.Infrastructure.Persistence", "src\CashFlow.Infrastructure.Persistence\CashFlow.Infrastructure.Persistence.csproj", "{37F89A4B-70B9-4B6C-9EB1-4D0C9C008A42}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CashFlow.API", "src\CashFlow.API\CashFlow.API.csproj", "{4BC94736-155C-428D-A991-F7605DE368A0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Setup", "Setup", "{7B03C5F8-9036-4DF3-A284-2605F3319B0F}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1 - Application", "1 - Application", "{3032E533-6333-434F-B198-0F3ADA76C2BE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2 - Domain", "2 - Domain", "{6B7C697D-2287-4718-B40E-A923B33AD5CC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3 - Infrastructure", "3 - Infrastructure", "{7E02D3A4-2463-48DD-A487-879975D25779}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4 - Tests", "4 - Tests", "{529843E1-E5CE-465D-A31A-E302F4CFB811}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0 - Presentation", "0 - Presentation", "{2FFF8B33-4895-4FAF-9FCB-60C6BF6BC95C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7281AB1E-FCE8-432C-BB04-161DB567E319}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7281AB1E-FCE8-432C-BB04-161DB567E319}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7281AB1E-FCE8-432C-BB04-161DB567E319}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7281AB1E-FCE8-432C-BB04-161DB567E319}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E998133-B7FD-4F8F-AEDD-966AF203D3CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E998133-B7FD-4F8F-AEDD-966AF203D3CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E998133-B7FD-4F8F-AEDD-966AF203D3CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E998133-B7FD-4F8F-AEDD-966AF203D3CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ACB3B04F-FF15-4572-A4FF-E4A196EBCBD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACB3B04F-FF15-4572-A4FF-E4A196EBCBD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACB3B04F-FF15-4572-A4FF-E4A196EBCBD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACB3B04F-FF15-4572-A4FF-E4A196EBCBD5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37F89A4B-70B9-4B6C-9EB1-4D0C9C008A42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37F89A4B-70B9-4B6C-9EB1-4D0C9C008A42}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37F89A4B-70B9-4B6C-9EB1-4D0C9C008A42}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37F89A4B-70B9-4B6C-9EB1-4D0C9C008A42}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4BC94736-155C-428D-A991-F7605DE368A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4BC94736-155C-428D-A991-F7605DE368A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4BC94736-155C-428D-A991-F7605DE368A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4BC94736-155C-428D-A991-F7605DE368A0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5E998133-B7FD-4F8F-AEDD-966AF203D3CD} = {3032E533-6333-434F-B198-0F3ADA76C2BE}
+		{7281AB1E-FCE8-432C-BB04-161DB567E319} = {6B7C697D-2287-4718-B40E-A923B33AD5CC}
+		{37F89A4B-70B9-4B6C-9EB1-4D0C9C008A42} = {7E02D3A4-2463-48DD-A487-879975D25779}
+		{ACB3B04F-FF15-4572-A4FF-E4A196EBCBD5} = {529843E1-E5CE-465D-A31A-E302F4CFB811}
+		{4BC94736-155C-428D-A991-F7605DE368A0} = {2FFF8B33-4895-4FAF-9FCB-60C6BF6BC95C}
+	EndGlobalSection
+EndGlobal

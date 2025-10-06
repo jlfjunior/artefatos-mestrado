@@ -1,0 +1,92 @@
+﻿version: '3.8'
+
+services:
+  #  cashflow.api:
+  #    image: cashflow.api
+  #    build:
+  #      context: .
+  #      dockerfile: src/CashFlow.API/Dockerfile
+  #    depends_on:
+  #      - mysql
+  #      - elasticsearch
+  #    ports:
+  #      - 57015:57015
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    ports:
+      - 27017:27017
+  
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    restart: always
+    ports:
+      - 28081:8081
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongodb
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: changeme
+      ME_CONFIG_MONGODB_URL: mongodb://mongodb:27017/
+    depends_on:
+      - mongodb
+  
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
+    container_name: elasticsearch
+    restart: always
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.15.0
+    container_name: logstash
+    restart: always
+    ports:
+      - 5044:5044
+    environment:
+      - "ELASTICSEARCH_HOST=elasticsearch:9200"
+      - "ELASTICSEARCH_USERNAME=your_elasticsearch_username"
+      - "ELASTICSEARCH_PASSWORD=your_elasticsearch_password"
+    volumes:
+      - ./logstash/config:/usr/share/logstash/config
+      - ./logstash/pipeline:/usr/share/logstash/pipeline
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.15.0
+    container_name: kibana
+    restart: always
+    ports:
+      - 5601:5601
+    environment:
+      - "ELASTICSEARCH_HOSTS=http://elasticsearch:9200"
+      - "ELASTICSEARCH_USERNAME=your_elasticsearch_username"
+      - "ELASTICSEARCH_PASSWORD=your_elasticsearch_password"
+
+  apm-server:
+    image: docker.elastic.co/apm/apm-server:7.15.0
+    container_name: apm-server
+    restart: always
+    ports:
+      - "8200:8200"
+    environment:
+      - "ELASTICSEARCH_HOSTS=http://elasticsearch:9200"
+      - "ELASTICSEARCH_USERNAME=your_elasticsearch_username"
+      - "ELASTICSEARCH_PASSWORD=your_elasticsearch_password"
+    volumes:
+      - ./apm-server/config:/usr/share/apm-server/config
+      - ./apm-server/data:/usr/share/apm-server/data
+
+volumes:
+  mysql_data:
+  elasticsearch_data:
