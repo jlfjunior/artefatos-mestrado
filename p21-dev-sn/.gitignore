@@ -1,0 +1,26 @@
+# Arquivos gerados pelo Visual Studio e build do .NET
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Diretórios de build
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+
+# Pastas de cache e configurações do VS
+.vs/
+.vscode/
+
+# Logs e arquivos temporários
+*.ncrunch*
+*.localhistory
+*.log
