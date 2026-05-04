@@ -1,0 +1,49 @@
+<div class="login-wrapper">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="logo-icon">B</div>
+      <div class="logo-text">
+        <span class="logo-title">Banco Carrefour</span>
+        <span class="logo-sub">Fluxo de Caixa</span>
+      </div>
+    </div>
+
+    <h1 class="login-heading">Bem-vindo de volta</h1>
+    <p class="login-sub">Entre com suas credenciais para acessar o sistema</p>
+
+    <div class="error-box" *ngIf="errorMessage">
+      <span>⚠ {{ errorMessage }}</span>
+    </div>
+
+    <div class="form-group">
+      <label>E-mail</label>
+      <input
+        type="email"
+        [(ngModel)]="email"
+        placeholder="comerciante@teste.com"
+        class="form-control"
+        (keyup.enter)="login()"
+      />
+    </div>
+
+    <div class="form-group">
+      <label>Senha</label>
+      <input
+        type="password"
+        [(ngModel)]="senha"
+        placeholder="••••••••"
+        class="form-control"
+        (keyup.enter)="login()"
+      />
+    </div>
+
+    <button class="btn-login" (click)="login()" [disabled]="isLoading">
+      <span *ngIf="!isLoading">Entrar</span>
+      <span *ngIf="isLoading">Autenticando...</span>
+    </button>
+
+    <p class="login-hint">
+      Credenciais de demo: <strong>comerciante&#64;teste.com</strong> / <strong>Senha&#64;123</strong>
+    </p>
+  </div>
+</div>

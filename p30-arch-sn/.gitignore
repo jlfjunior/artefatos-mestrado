@@ -1,0 +1,64 @@
+# BUILD
+bin/
+obj/
+out/
+*.dll
+*.exe
+*.pdb
+*.cache
+*.log
+
+# DOTNET / VS
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# RIDER / JETBRAINS
+.idea/
+*.sln.iml
+*.DotSettings.user
+
+# NUGET
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+*.lock.json
+
+# TEST
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+# LOGS
+logs/
+*.log
+
+# SQLITE
+*.db
+*.db-shm
+*.db-wal
+
+# ENV
+.env
+.env.*
+appsettings.Development.json
+
+# DOCKER
+docker-compose.override.yml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# TEMP
+tmp/
+temp/
+*.tmp
+
+# COVERAGE
+coverage/
+coverage.json

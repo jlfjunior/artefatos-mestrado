@@ -1,0 +1,41 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+*.vs/
+.vs/
+*.log
+*.cache
+TestResults/
+coverage/
+*.ncrunch*
+launchSettings.json
+
+# Secrets / configurações locais
+appsettings.Local.json
+appsettings.Development.json
+*.pfx
+*.p12
+secrets.json
+
+# Docker
+.dockerignore
+
+# Node / Angular
+frontend/**/node_modules/
+frontend/**/.angular/
+frontend/**/dist/
+frontend/**/*.js.map
+frontend/**/coverage/
+frontend/**/.env
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.idea/
+*.swp
+*.swo

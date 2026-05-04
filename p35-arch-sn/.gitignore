@@ -1,0 +1,32 @@
+# SonarQube
+.sonarqube/
+.sonar/
+coverage.opencover.xml
+TestResults/
+
+# .NET Build artifacts
+bin/
+obj/
+*.exe
+*.dll
+*.pdb
+*.user
+*.suo
+*.sln.docstates
+
+# Visual Studio
+.vs/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# User specific files
+*.user
+*.userosscache
+*.sln.docstates
+
+# Rider
+.idea/
+*.sln.iml

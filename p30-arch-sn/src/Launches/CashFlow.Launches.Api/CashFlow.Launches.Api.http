@@ -1,0 +1,64 @@
+@launches_host = http://localhost:5000
+
+### Health Check
+GET {{launches_host}}/health
+Accept: application/json
+
+###
+
+### [SUCESSO] Criar lançamento válido (credit)
+POST {{launches_host}}/api/launches
+Content-Type: application/json
+
+{
+  "amount": 150.75,
+  "type": "credit",
+  "occurredOnUtc": "2026-04-26T12:00:00Z"
+}
+
+###
+
+### [SUCESSO] Criar lançamento válido (debit)
+POST {{launches_host}}/api/launches
+Content-Type: application/json
+
+{
+  "amount": 50.00,
+  "type": "debit",
+  "occurredOnUtc": "2026-04-26T12:05:00Z"
+}
+
+###
+
+### [ERRO DE VALIDAÇÃO] Amount inválido (<= 0)
+POST {{launches_host}}/api/launches
+Content-Type: application/json
+
+{
+  "amount": 0,
+  "type": "credit",
+  "occurredOnUtc": "2026-04-26T12:10:00Z"
+}
+
+###
+
+### [ERRO DE VALIDAÇÃO] Type inválido
+POST {{launches_host}}/api/launches
+Content-Type: application/json
+
+{
+  "amount": 100,
+  "type": "transfer",
+  "occurredOnUtc": "2026-04-26T12:15:00Z"
+}
+
+###
+
+### [ERRO DE VALIDAÇÃO] Payload malformado (campo obrigatório ausente)
+POST {{launches_host}}/api/launches
+Content-Type: application/json
+
+{
+  "amount": 100,
+  "type": "credit"
+}

@@ -1,0 +1,10 @@
+bin/
+obj/
+.vs/
+.appdata/
+.dotnet-home/
+.nuget/
+*.log
+data/*.db
+data/*.db-shm
+data/*.db-wal

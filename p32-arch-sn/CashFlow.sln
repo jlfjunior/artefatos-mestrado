@@ -1,0 +1,50 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E05C69F8-1B35-44E0-8000-D484191D07D9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CashFlow.Shared", "src\CashFlow.Shared\CashFlow.Shared.csproj", "{77DBBDDF-CDAC-405B-9823-744F73BA98CC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CashFlow.Lancamentos.Api", "src\CashFlow.Lancamentos.Api\CashFlow.Lancamentos.Api.csproj", "{FC07655E-BC51-4D1B-9E52-F04ACD30F2E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CashFlow.Consolidado.Api", "src\CashFlow.Consolidado.Api\CashFlow.Consolidado.Api.csproj", "{65F2FE26-1D33-4F18-893B-CC894C018352}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{7CD21849-317B-457E-977A-EC96001194CE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CashFlow.Tests", "tests\CashFlow.Tests\CashFlow.Tests.csproj", "{1CB7549A-D993-4D55-B0FC-C2F56EF89871}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{77DBBDDF-CDAC-405B-9823-744F73BA98CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77DBBDDF-CDAC-405B-9823-744F73BA98CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77DBBDDF-CDAC-405B-9823-744F73BA98CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77DBBDDF-CDAC-405B-9823-744F73BA98CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC07655E-BC51-4D1B-9E52-F04ACD30F2E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC07655E-BC51-4D1B-9E52-F04ACD30F2E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC07655E-BC51-4D1B-9E52-F04ACD30F2E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC07655E-BC51-4D1B-9E52-F04ACD30F2E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65F2FE26-1D33-4F18-893B-CC894C018352}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65F2FE26-1D33-4F18-893B-CC894C018352}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65F2FE26-1D33-4F18-893B-CC894C018352}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65F2FE26-1D33-4F18-893B-CC894C018352}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1CB7549A-D993-4D55-B0FC-C2F56EF89871}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CB7549A-D993-4D55-B0FC-C2F56EF89871}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CB7549A-D993-4D55-B0FC-C2F56EF89871}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CB7549A-D993-4D55-B0FC-C2F56EF89871}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{77DBBDDF-CDAC-405B-9823-744F73BA98CC} = {E05C69F8-1B35-44E0-8000-D484191D07D9}
+		{FC07655E-BC51-4D1B-9E52-F04ACD30F2E8} = {E05C69F8-1B35-44E0-8000-D484191D07D9}
+		{65F2FE26-1D33-4F18-893B-CC894C018352} = {E05C69F8-1B35-44E0-8000-D484191D07D9}
+		{1CB7549A-D993-4D55-B0FC-C2F56EF89871} = {7CD21849-317B-457E-977A-EC96001194CE}
+	EndGlobalSection
+EndGlobal

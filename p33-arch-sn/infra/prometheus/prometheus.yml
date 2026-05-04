@@ -1,0 +1,68 @@
+# Prometheus — desenvolvimento local (docker compose)
+# Ajuste os targets quando os serviços expuserem /metrics (prometheus-net).
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  - job_name: cashflow-api
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["cashflow-api:8080"]
+        labels:
+          service: cashflow-api
+
+  - job_name: dashboard-api
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["dashboard-api:8080"]
+        labels:
+          service: dashboard-api
+
+  - job_name: gateway
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["gateway:8080"]
+        labels:
+          service: gateway
+
+  - job_name: postgres
+    static_configs:
+      - targets: ["postgres-exporter:9187"]
+        labels:
+          service: postgres
+
+  - job_name: mongodb
+    static_configs:
+      - targets: ["mongodb-exporter:9216"]
+        labels:
+          service: mongodb
+
+  - job_name: redis
+    static_configs:
+      - targets: ["redis-exporter:9121"]
+        labels:
+          service: redis
+
+  - job_name: elasticsearch
+    static_configs:
+      - targets: ["elasticsearch-exporter:9114"]
+        labels:
+          service: elasticsearch
+
+  - job_name: rabbitmq
+    static_configs:
+      - targets: ["rabbitmq-exporter:9419"]
+        labels:
+          service: rabbitmq
+
+  - job_name: immudb
+    static_configs:
+      - targets: ["immudb:9497"]
+        labels:
+          service: immudb

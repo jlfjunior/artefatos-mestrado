@@ -1,0 +1,29 @@
+@consolidation_host = http://localhost:5100
+
+### Health Check
+GET {{consolidation_host}}/health
+Accept: application/json
+
+###
+
+### [SUCESSO] Buscar consolidado diário existente
+GET {{consolidation_host}}/api/consolidations/2026-04-26
+Accept: application/json
+
+###
+
+### [ERRO NOT FOUND] Buscar consolidado diário inexistente
+GET {{consolidation_host}}/api/consolidations/2099-01-01
+Accept: application/json
+
+###
+
+### [SUCESSO] Buscar consolidado por período
+GET {{consolidation_host}}/api/consolidations?startDate=2026-04-20&endDate=2026-04-26
+Accept: application/json
+
+###
+
+### [ERRO DE VALIDAÇÃO] Período com data inválida
+GET {{consolidation_host}}/api/consolidations?startDate=2026-99-99&endDate=2026-04-26
+Accept: application/json

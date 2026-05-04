@@ -1,0 +1,134 @@
+<!-- Top Cards -->
+<section class="kpi-cards">
+  <div class="card card-blue">
+    <div class="card-header">
+      <span>Saldo Total</span>
+      <i class="icon">account_balance</i>
+    </div>
+    <div class="card-value">
+      {{ consolidado ? (consolidado.saldoConsolidado | currency:'BRL':'symbol':'1.2-2') : 'Carregando...' }}
+    </div>
+    <div class="card-footer">
+      Lançamentos hoje: {{ consolidado?.quantidadeLancamentos || 0 }}
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-icon-wrapper success-bg">
+      <i class="icon success-text">trending_up</i>
+    </div>
+    <div class="card-content">
+      <span class="card-label">Créditos de Hoje</span>
+      <span class="card-amount success-text">+ {{ consolidado ? (consolidado.totalCreditos | currency:'BRL':'symbol':'1.2-2') : '...' }}</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-icon-wrapper error-bg">
+      <i class="icon error-text">trending_down</i>
+    </div>
+    <div class="card-content">
+      <span class="card-label">Débitos de Hoje</span>
+      <span class="card-amount error-text">- {{ consolidado ? (consolidado.totalDebitos | currency:'BRL':'symbol':'1.2-2') : '...' }}</span>
+    </div>
+  </div>
+</section>
+
+<!-- Main Layout -->
+<section class="dashboard-grid">
+  <!-- Coluna Esquerda: Tabela -->
+  <div class="col-left">
+    <div class="recent-transactions">
+      <div class="section-header">
+        <h2>Lançamentos de Hoje ({{ hoje | date:'dd/MM/yyyy' }})</h2>
+        <a href="#" class="link" (click)="$event.preventDefault(); carregarDados()">Atualizar Agora</a>
+      </div>
+      
+      <table class="tx-table" *ngIf="lancamentos.length > 0; else noLancamentos">
+        <thead>
+          <tr>
+            <th>DATA/HORA</th>
+            <th>DESCRIÇÃO</th>
+            <th>TIPO</th>
+            <th class="align-right">VALOR</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let l of lancamentos">
+            <td>{{ l.dataHoraLocal | date:'dd MMM, yy HH:mm' }}</td>
+            <td><strong>{{ l.descricao }}</strong><br><span class="muted">ID: #{{ l.id.substring(0, 8) }}</span></td>
+            <td>
+              <span class="badge" [ngClass]="{'badge-error': l.tipo === 'DEBITO', 'badge-success': l.tipo === 'CREDITO'}">
+                {{ l.tipo === 'CREDITO' ? 'Crédito' : 'Débito' }}
+              </span>
+            </td>
+            <td class="align-right"><strong>{{ l.valor | currency:'BRL':'symbol':'1.2-2' }}</strong></td>
+          </tr>
+        </tbody>
+      </table>
+      <ng-template #noLancamentos>
+        <p style="padding: 24px; text-align: center; color: var(--color-gray-dark);">Nenhum lançamento registrado hoje.</p>
+      </ng-template>
+    </div>
+  </div>
+
+  <!-- Coluna Direita: Forms & Status -->
+  <div class="col-right">
+    <!-- Quick Add Form -->
+    <div class="quick-add-card">
+      <div class="qa-header">
+        <div class="icon-circle"><i class="icon">add</i></div>
+        <h3>Lançamento<br>Rápido</h3>
+      </div>
+      <div class="form-group">
+        <label>DESCRIÇÃO</label>
+        <input type="text" [(ngModel)]="novoLancamento.descricao" placeholder="Ex: Material de Escritório" class="form-control">
+      </div>
+      <div class="form-row">
+        <div class="form-group half">
+          <label>VALOR (R$)</label>
+          <input type="number" [(ngModel)]="novoLancamento.valor" placeholder="0,00" class="form-control">
+        </div>
+        <div class="form-group half">
+          <label>TIPO</label>
+          <select [(ngModel)]="novoLancamento.tipo" class="form-control">
+            <option value="Débito">Débito</option>
+            <option value="Crédito">Crédito</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-block" (click)="registrarLancamento()" [disabled]="isSubmitting || !novoLancamento.descricao || novoLancamento.valor <= 0">
+        {{ isSubmitting ? 'Registrando...' : 'Registrar Lançamento' }}
+      </button>
+    </div>
+
+    <!-- Status Widget -->
+    <div class="status-card">
+      <h3>STATUS DO SISTEMA</h3>
+      <ul class="status-list">
+        <li>
+          <div class="status-info">
+            <span class="dot dot-success"></span> Lançamentos API
+          </div>
+          <span class="status-val success-text">Conectado</span>
+        </li>
+        <li>
+          <div class="status-info">
+            <span class="dot dot-success"></span> Consolidado Diário API
+          </div>
+          <span class="status-val success-text">Conectado</span>
+        </li>
+        <li>
+          <div class="status-info">
+            <span class="dot dot-success"></span> RabbitMQ Sync
+          </div>
+          <span class="status-val success-text">Assíncrono</span>
+        </li>
+      </ul>
+      <div class="status-alert">
+        <i class="icon success-text" style="background:#eaf6ec; border-radius:50%; padding:4px; font-size:16px;">check</i>
+        <span>Todos os serviços estão disponíveis e o mensageiro atualiza de forma assíncrona.</span>
+      </div>
+    </div>
+  </div>
+</section>

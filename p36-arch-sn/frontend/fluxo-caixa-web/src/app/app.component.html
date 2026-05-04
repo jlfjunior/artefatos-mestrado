@@ -1,0 +1,70 @@
+<!-- Página de Login: sem sidebar, tela cheia -->
+<ng-container *ngIf="isLoginPage">
+  <router-outlet></router-outlet>
+</ng-container>
+
+<!-- Layout principal (sidebar + conteúdo) -->
+<div class="layout" *ngIf="!isLoginPage">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <img src="assets/carrefour-banco-logo.png" alt="Carrefour Banco" class="brand-logo">
+    </div>
+
+    <nav class="nav-menu">
+      <a routerLink="/dashboard" routerLinkActive="active" class="nav-item">
+        <i class="icon">grid_view</i>
+        Dashboard
+      </a>
+      <a routerLink="/lancamentos" routerLinkActive="active" class="nav-item">
+        <i class="icon">list_alt</i>
+        Lançamentos
+      </a>
+      <a routerLink="/consolidado" routerLinkActive="active" class="nav-item">
+        <i class="icon">account_balance_wallet</i>
+        Consolidado Diário
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a routerLink="/lancamentos" class="btn btn-primary btn-block" style="text-decoration:none;text-align:center">
+        <i class="icon">add</i> Novo Lançamento
+      </a>
+      <button class="btn-logout" (click)="logout()" title="Sair">
+        <i class="icon">logout</i>
+        <span>Sair</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Header -->
+    <header class="top-header">
+      <div class="search-bar">
+        <i class="icon search-icon">search</i>
+        <input type="text" placeholder="Pesquisar lançamentos...">
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn"><i class="icon">notifications</i></button>
+        <button class="icon-btn"><i class="icon">help_outline</i></button>
+        <div class="avatar" (click)="logout()" title="Clique para sair" style="cursor:pointer">
+          <img src="https://i.pravatar.cc/150?img=11" alt="Perfil">
+        </div>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <router-outlet></router-outlet>
+
+      <footer class="app-footer">
+        <span>© 2024 Banco Carrefour S.A.</span>
+        <div class="links">
+          <a href="#">Suporte</a>
+          <a href="#">Política de Privacidade</a>
+          <a href="#">Termos de Uso</a>
+        </div>
+      </footer>
+    </div>
+  </main>
+</div>

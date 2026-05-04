@@ -1,0 +1,42 @@
+### Criar crédito
+POST http://localhost:5081/v1/lancamentos
+Content-Type: application/json
+Chave-Idempotencia: 6f7f2fd1-4d1a-4f0b-a4e1-f87bc55a14c2
+
+{
+  "comercianteId": "lojista-01",
+  "dataNegocio": "2026-04-16",
+  "tipo": "Credito",
+  "valor": 120.50,
+  "descricao": "Venda no PDV",
+  "origem": "PDV"
+}
+
+### Criar débito
+POST http://localhost:5081/v1/lancamentos
+Content-Type: application/json
+Chave-Idempotencia: 1d4fdaf1-ec64-4b2a-b38f-5ff6c875c8e7
+
+{
+  "comercianteId": "lojista-01",
+  "dataNegocio": "2026-04-16",
+  "tipo": "Debito",
+  "valor": 20.00,
+  "descricao": "Taxa de adquirente",
+  "origem": "ERP"
+}
+
+### Listar lançamentos
+GET http://localhost:5081/v1/lancamentos?comercianteId=lojista-01&dataNegocio=2026-04-16
+
+### Consultar consolidado
+GET http://localhost:5082/v1/consolidado/diario?comercianteId=lojista-01&dataNegocio=2026-04-16
+
+### Reprocessar saldo diário
+POST http://localhost:5082/v1/consolidado/diario/reprocessamentos
+Content-Type: application/json
+
+{
+  "comercianteId": "lojista-01",
+  "dataNegocio": "2026-04-16"
+}

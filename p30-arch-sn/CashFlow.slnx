@@ -1,0 +1,26 @@
+<Solution>
+	<Folder Name="/BuildingBlocks/">
+		<Project Path="src/BuildingBlocks/CashFlow.BuildingBlocks/CashFlow.BuildingBlocks.csproj" />
+	</Folder>
+	<Folder Name="/Services/Launches/">
+		<Project Path="src/Launches/CashFlow.Launches.Api/CashFlow.Launches.Api.csproj" />
+		<Project Path="src/Launches/CashFlow.Launches.Application/CashFlow.Launches.Application.csproj" />
+		<Project Path="src/Launches/CashFlow.Launches.Domain/CashFlow.Launches.Domain.csproj" />
+		<Project Path="src/Launches/CashFlow.Launches.Infrastructure/CashFlow.Launches.Infrastructure.csproj" />
+	</Folder>
+	<Folder Name="/Services/Consolidation/">
+		<Project Path="src/Consolidation/CashFlow.Consolidation.Api/CashFlow.Consolidation.Api.csproj" />
+		<Project Path="src/Consolidation/CashFlow.Consolidation.Application/CashFlow.Consolidation.Application.csproj" />
+		<Project Path="src/Consolidation/CashFlow.Consolidation.Domain/CashFlow.Consolidation.Domain.csproj" />
+		<Project Path="src/Consolidation/CashFlow.Consolidation.Infrastructure/CashFlow.Consolidation.Infrastructure.csproj" />
+		<Project Path="src/Consolidation/CashFlow.Consolidation.Worker/CashFlow.Consolidation.Worker.csproj" />
+	</Folder>
+	<Folder Name="/Tests/Launches/">
+		<Project Path="tests/Launches/CashFlow.Launches.UnitTests/CashFlow.Launches.UnitTests.csproj" />
+		<Project Path="tests/Launches/CashFlow.Launches.IntegrationTests/CashFlow.Launches.IntegrationTests.csproj" />
+	</Folder>
+	<Folder Name="/Tests/Consolidation/">
+		<Project Path="tests/Consolidation/CashFlow.Consolidation.UnitTests/CashFlow.Consolidation.UnitTests.csproj" />
+		<Project Path="tests/Consolidation/CashFlow.Consolidation.IntegrationTests/CashFlow.Consolidation.IntegrationTests.csproj" />
+	</Folder>
+</Solution>

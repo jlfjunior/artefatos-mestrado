@@ -1,0 +1,179 @@
+<!-- HERO CARD -->
+<div class="page-hero">
+  <div class="hero-label">VISÃO GERAL</div>
+  <div class="hero-content">
+    <div class="hero-left">
+      <h1 class="hero-title">Saldo Consolidado Diário</h1>
+      <p class="hero-sub">Monitore a força de caixa consolidado com precisão institucional e atualização em tempo real.</p>
+    </div>
+    <div class="hero-right">
+      <div class="hero-value">
+        <ng-container *ngIf="!isLoading">
+          <ng-container *ngIf="consolidadoUnico">
+            {{ consolidadoUnico.saldoConsolidado | currency:'BRL':'symbol':'1.2-2' }}
+          </ng-container>
+          <ng-container *ngIf="agregado">
+            {{ agregado.saldoConsolidado | currency:'BRL':'symbol':'1.2-2' }}
+          </ng-container>
+          <ng-container *ngIf="!consolidadoUnico && !agregado">—</ng-container>
+        </ng-container>
+        <ng-container *ngIf="isLoading">Carregando...</ng-container>
+      </div>
+      <div class="hero-change success-text" *ngIf="consolidadoUnico || agregado">
+        <i class="icon" style="font-size:14px">trending_up</i>
+        {{ modoRange ? agregado?.label : ('Atualizado ' + (consolidadoUnico?.ultimaAtualizacao | date:'HH:mm')) }}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PERIOD FILTERS -->
+<div class="toolbar">
+  <div class="period-tabs">
+    <button class="period-tab" [class.active]="periodo === 'hoje'" (click)="setPeriodo('hoje')">Hoje</button>
+    <button class="period-tab" [class.active]="periodo === '30d'" (click)="setPeriodo('30d')">Últimos 30 Dias</button>
+    <button class="period-tab" [class.active]="periodo === '90d'" (click)="setPeriodo('90d')">Últimos 90 Dias</button>
+    <button class="period-tab" [class.active]="periodo === 'custom'" (click)="setPeriodo('custom')">Personalizado</button>
+  </div>
+  <div class="toolbar-right">
+    <div class="date-badge" *ngIf="periodo === 'custom'">
+      <i class="icon" style="font-size:16px">calendar_today</i>
+      <input type="date" [(ngModel)]="dataInicio" (change)="carregar()" class="form-control-inline">
+    </div>
+    <div class="date-badge" *ngIf="periodo !== 'custom' && !modoRange">
+      <i class="icon" style="font-size:16px">calendar_today</i>
+      {{ dataInicio | date:'dd MMM, yyyy' }}
+    </div>
+    <div class="date-badge" *ngIf="modoRange">
+      <i class="icon" style="font-size:16px">calendar_today</i>
+      {{ dataInicio | date:'dd/MM' }} — {{ dataFim | date:'dd/MM/yyyy' }}
+    </div>
+    <button class="btn btn-primary btn-sm" (click)="carregar()">
+      <i class="icon" style="font-size:16px">tune</i> Atualizar
+    </button>
+  </div>
+</div>
+
+<!-- KPI SUMMARY CARDS -->
+<div class="summary-cards" *ngIf="consolidadoUnico && !isLoading">
+  <div class="summary-card">
+    <span class="summary-label">Total Créditos</span>
+    <span class="summary-val success-text">+ {{ consolidadoUnico.totalCreditos | currency:'BRL':'symbol':'1.2-2' }}</span>
+  </div>
+  <div class="summary-card">
+    <span class="summary-label">Total Débitos</span>
+    <span class="summary-val error-text">- {{ consolidadoUnico.totalDebitos | currency:'BRL':'symbol':'1.2-2' }}</span>
+  </div>
+  <div class="summary-card">
+    <span class="summary-label">Saldo Final</span>
+    <span class="summary-val" [class.success-text]="consolidadoUnico.saldoConsolidado >= 0" [class.error-text]="consolidadoUnico.saldoConsolidado < 0">
+      {{ consolidadoUnico.saldoConsolidado | currency:'BRL':'symbol':'1.2-2' }}
+    </span>
+  </div>
+  <div class="summary-card">
+    <span class="summary-label">Lançamentos</span>
+    <span class="summary-val">{{ consolidadoUnico.quantidadeLancamentos }}</span>
+  </div>
+</div>
+
+<div class="summary-cards" *ngIf="agregado && !isLoading">
+  <div class="summary-card">
+    <span class="summary-label">Total Créditos</span>
+    <span class="summary-val success-text">+ {{ agregado.totalCreditos | currency:'BRL':'symbol':'1.2-2' }}</span>
+  </div>
+  <div class="summary-card">
+    <span class="summary-label">Total Débitos</span>
+    <span class="summary-val error-text">- {{ agregado.totalDebitos | currency:'BRL':'symbol':'1.2-2' }}</span>
+  </div>
+  <div class="summary-card">
+    <span class="summary-label">Saldo do Período</span>
+    <span class="summary-val" [class.success-text]="agregado.saldoConsolidado >= 0" [class.error-text]="agregado.saldoConsolidado < 0">
+      {{ agregado.saldoConsolidado | currency:'BRL':'symbol':'1.2-2' }}
+    </span>
+  </div>
+  <div class="summary-card">
+    <span class="summary-label">Lançamentos</span>
+    <span class="summary-val">{{ agregado.quantidadeLancamentos }}</span>
+  </div>
+</div>
+
+<!-- TABELA -->
+<div class="data-card">
+  <div class="data-card-header">
+    <h2>Detalhamento dos Dados</h2>
+    <span style="color:var(--color-text-muted);font-size:14px">
+      <ng-container *ngIf="!modoRange && !isLoading">{{ dataInicio | date:'dd/MM/yyyy' }}</ng-container>
+      <ng-container *ngIf="modoRange && !isLoading">{{ dataInicio | date:'dd/MM/yyyy' }} a {{ dataFim | date:'dd/MM/yyyy' }} · {{ agregado?.dias?.length || 0 }} dias com dados</ng-container>
+    </span>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-state">
+    <i class="icon spin">sync</i> Carregando dados...
+  </div>
+
+  <div *ngIf="erro" class="empty-state error-text">{{ erro }}</div>
+
+  <!-- Modo: dia único -->
+  <table class="tx-table" *ngIf="!isLoading && consolidadoUnico && !erro">
+    <thead>
+      <tr>
+        <th>Data</th>
+        <th>Total Créditos</th>
+        <th>Total Débitos</th>
+        <th class="align-right">Saldo Final</th>
+        <th class="align-right">Lançamentos</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>{{ consolidadoUnico.data | date:'dd MMM, yyyy' }}</td>
+        <td><span class="amount-credit">+ {{ consolidadoUnico.totalCreditos | currency:'BRL':'symbol':'1.2-2' }}</span></td>
+        <td><span class="amount-debit">- {{ consolidadoUnico.totalDebitos | currency:'BRL':'symbol':'1.2-2' }}</span></td>
+        <td class="align-right">
+          <strong [class.success-text]="consolidadoUnico.saldoConsolidado >= 0" [class.error-text]="consolidadoUnico.saldoConsolidado < 0">
+            {{ consolidadoUnico.saldoConsolidado | currency:'BRL':'symbol':'1.2-2' }}
+          </strong>
+        </td>
+        <td class="align-right">{{ consolidadoUnico.quantidadeLancamentos }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Modo: range (30d / 90d) -->
+  <table class="tx-table" *ngIf="!isLoading && agregado && !erro && agregado.dias.length > 0">
+    <thead>
+      <tr>
+        <th>Data</th>
+        <th>Total Créditos</th>
+        <th>Total Débitos</th>
+        <th class="align-right">Saldo do Dia</th>
+        <th class="align-right">Lançamentos</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let dia of agregado.dias">
+        <td>{{ dia.data | date:'dd MMM, yyyy' }}</td>
+        <td><span class="amount-credit">+ {{ dia.totalCreditos | currency:'BRL':'symbol':'1.2-2' }}</span></td>
+        <td><span class="amount-debit">- {{ dia.totalDebitos | currency:'BRL':'symbol':'1.2-2' }}</span></td>
+        <td class="align-right">
+          <strong [class.success-text]="dia.saldoConsolidado >= 0" [class.error-text]="dia.saldoConsolidado < 0">
+            {{ dia.saldoConsolidado | currency:'BRL':'symbol':'1.2-2' }}
+          </strong>
+        </td>
+        <td class="align-right">{{ dia.quantidadeLancamentos }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="!isLoading && agregado && agregado.dias.length === 0 && !erro" class="empty-state">
+    <i class="icon" style="font-size:48px;color:#D1D5DB">inbox</i>
+    <p>Nenhum dado consolidado para o período selecionado</p>
+    <p class="muted" style="margin-top:8px">Os dados são atualizados de forma assíncrona após cada lançamento.</p>
+  </div>
+
+  <div *ngIf="!isLoading && !consolidadoUnico && !agregado && !erro" class="empty-state">
+    <i class="icon" style="font-size:48px;color:#D1D5DB">inbox</i>
+    <p>Nenhum dado consolidado para {{ dataInicio | date:'dd/MM/yyyy' }}</p>
+    <p class="muted" style="margin-top:8px">Os dados são atualizados de forma assíncrona após cada lançamento.</p>
+  </div>
+</div>

@@ -1,0 +1,109 @@
+<!-- HERO -->
+<div class="page-hero">
+  <div class="hero-label">TRANSAÇÕES</div>
+  <div class="hero-content">
+    <div class="hero-left">
+      <h1 class="hero-title">Registro de Lançamentos</h1>
+      <p class="hero-sub">Gerencie créditos e débitos com rastreabilidade completa e processamento em tempo real.</p>
+    </div>
+    <div class="hero-right">
+      <div class="hero-value">{{ lancamentos.length }}</div>
+      <div class="hero-unit">lançamentos hoje</div>
+    </div>
+  </div>
+</div>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <div class="date-badge">
+    <i class="icon" style="font-size:16px">calendar_today</i>
+    <input type="date" [(ngModel)]="dataSelecionada" (change)="carregar()" class="form-control-inline">
+  </div>
+  <div class="toolbar-right">
+    <button class="btn-export" (click)="carregar()"><i class="icon" style="font-size:18px">refresh</i> Atualizar</button>
+    <button class="btn btn-primary btn-sm" (click)="showForm = !showForm">
+      <i class="icon" style="font-size:16px">{{ showForm ? 'close' : 'add' }}</i>
+      {{ showForm ? 'Cancelar' : 'Novo Lançamento' }}
+    </button>
+  </div>
+</div>
+
+<!-- INLINE FORM (collapses) -->
+<div class="data-card" *ngIf="showForm">
+  <h2 style="margin-bottom:20px"><i class="icon" style="font-size:20px;vertical-align:middle;margin-right:8px">add_circle</i>Novo Lançamento</h2>
+  <div class="form-row-wide">
+    <div class="form-group flex-grow">
+      <label>DESCRIÇÃO</label>
+      <input type="text" [(ngModel)]="novoLancamento.descricao" placeholder="Ex: Pagamento Fornecedor ABC" class="form-control">
+    </div>
+    <div class="form-group w180">
+      <label>VALOR (R$)</label>
+      <input type="number" [(ngModel)]="novoLancamento.valor" placeholder="0,00" class="form-control">
+    </div>
+    <div class="form-group w140">
+      <label>TIPO</label>
+      <select [(ngModel)]="novoLancamento.tipo" class="form-control">
+        <option value="Débito">Débito</option>
+        <option value="Crédito">Crédito</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" style="align-self:flex-end;padding:12px 24px"
+      (click)="registrar()"
+      [disabled]="isSubmitting || !novoLancamento.descricao || novoLancamento.valor <= 0">
+      {{ isSubmitting ? 'Salvando...' : 'Registrar' }}
+    </button>
+  </div>
+</div>
+
+<!-- DATA TABLE -->
+<div class="data-card">
+  <div class="data-card-header">
+    <h2>Detalhamento dos Dados</h2>
+    <div class="search-inline">
+      <i class="icon" style="font-size:16px;color:var(--color-text-muted)">search</i>
+      <span style="color:var(--color-text-muted);font-size:14px">{{ dataSelecionada | date:'dd/MM/yyyy' }}</span>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-state">
+    <i class="icon spin">sync</i> Carregando lançamentos...
+  </div>
+
+  <table class="tx-table" *ngIf="!isLoading && lancamentos.length > 0">
+    <thead>
+      <tr>
+        <th>Data</th>
+        <th>Descrição</th>
+        <th>Tipo</th>
+        <th class="align-right">Valor</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let l of lancamentos">
+        <td>{{ (l.dataHoraLocal || l.dataHora) | date:'dd MMM, yyyy HH:mm' }}</td>
+        <td>
+          <strong>{{ l.descricao }}</strong><br>
+          <span class="muted">ID: #{{ l.id.substring(0,8) }}</span>
+        </td>
+        <td>
+          <span class="badge"
+            [class.badge-success]="l.tipo?.toUpperCase() === 'CREDITO' || l.tipo === 'Crédito'"
+            [class.badge-error]="l.tipo?.toUpperCase() === 'DEBITO' || l.tipo === 'Débito'">
+            {{ l.tipo }}
+          </span>
+        </td>
+        <td class="align-right">
+          <span [class.amount-credit]="l.tipo?.toUpperCase() === 'CREDITO' || l.tipo === 'Crédito'"
+                [class.amount-debit]="l.tipo?.toUpperCase() === 'DEBITO' || l.tipo === 'Débito'">
+            <strong>{{ l.valor | currency:'BRL':'symbol':'1.2-2' }}</strong>
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="!isLoading && lancamentos.length === 0" class="empty-state">
+    <i class="icon" style="font-size:48px;color:#D1D5DB">receipt_long</i>
+    <p>Nenhum lançamento em {{ dataSelecionada | date:'dd/MM/yyyy' }}</p>
+  </div>
+</div>

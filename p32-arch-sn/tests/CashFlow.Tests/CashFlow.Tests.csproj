@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
+    <PackageReference Include="xunit" Version="2.6.6" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.6">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\CashFlow.Shared\CashFlow.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\src\CashFlow.Lancamentos.Api\Application\RegisterEntryCommandResult.cs" Link="Source\Lancamentos\RegisterEntryCommandResult.cs" />
+    <Compile Include="..\..\src\CashFlow.Lancamentos.Api\Application\RegisterEntryHandler.cs" Link="Source\Lancamentos\RegisterEntryHandler.cs" />
+    <Compile Include="..\..\src\CashFlow.Lancamentos.Api\Infrastructure\Contracts.cs" Link="Source\Lancamentos\Contracts.cs" />
+    <Compile Include="..\..\src\CashFlow.Consolidado.Api\Application\DailyBalanceProjector.cs" Link="Source\Consolidado\DailyBalanceProjector.cs" />
+    <Compile Include="..\..\src\CashFlow.Consolidado.Api\Application\ReprocessDailyBalanceHandler.cs" Link="Source\Consolidado\ReprocessDailyBalanceHandler.cs" />
+    <Compile Include="..\..\src\CashFlow.Consolidado.Api\Infrastructure\Contracts.cs" Link="Source\Consolidado\Contracts.cs" />
+  </ItemGroup>
+</Project>
