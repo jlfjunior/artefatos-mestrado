@@ -1,1 +1,0 @@
-"""Cashflow challenge application package."""
