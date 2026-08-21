@@ -1,0 +1,5 @@
+name: challenger-easyflow
+include:
+  - ./compose.identity.yaml
+  - ./compose.databases.yaml
+  - ./compose.messagebroker.yaml

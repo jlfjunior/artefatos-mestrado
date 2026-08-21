@@ -1,0 +1,16 @@
+# Please refer https://aka.ms/HTTPSinContainer on how to setup an https developer certificate for your ASP.NET Core service.
+
+services:
+  challengereasyflowworkers:
+    image: challengereasyflowworkers
+    build:
+      context: .
+      dockerfile: Src/Challenger.EasyFlow.Workers/Dockerfile
+      args:
+        - configuration=Debug
+    ports:
+      - 8001:8001
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    volumes:
+      - ~/.vsdbg:/remote_debugger:rw

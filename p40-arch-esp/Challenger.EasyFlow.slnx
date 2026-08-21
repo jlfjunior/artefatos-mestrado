@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/Src/">
+    <Project Path="Src/Challenger.EasyFlow.API/Challenger.EasyFlow.API.csproj" />
+    <Project Path="Src/Challenger.EasyFlow.Application/Challenger.EasyFlow.Application.csproj" />
+    <Project Path="Src/Challenger.EasyFlow.Domain/Challenger.EasyFlow.Domain.csproj" />
+    <Project Path="Src/Challenger.EasyFlow.Infrastructure/Challenger.EasyFlow.Infrastructure.csproj" />
+    <Project Path="Src/Challenger.EasyFlow.Workers/Challenger.EasyFlow.Workers.csproj" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="Tests/Challenger.EasyFlow.UnitTests/Challenger.EasyFlow.UnitTests.csproj" />
+  </Folder>
+</Solution>

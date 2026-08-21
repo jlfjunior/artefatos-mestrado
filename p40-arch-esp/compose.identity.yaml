@@ -1,0 +1,39 @@
+name: challenger-easyflow
+networks:
+  keycloak-network:
+    driver: bridge
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: keycloak
+    command: start-dev
+    environment:
+      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN_USERNAME}
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://keycloak-postgres:5432/keycloak
+      - KC_DB_USERNAME=${KEYCLOAK_DATABASE_USERNAME}
+      - KC_DB_PASSWORD=${KEYCLOAK_DATABASE_PASSWORD}
+      - KC_HEALTH_ENABLED=true
+      - KC_METRICS_ENABLED=true
+    ports:
+      - 9000:8080
+    networks:
+      - keycloak-network
+    depends_on:
+      - keycloak-postgres
+    volumes:
+      - .volumes/Keycloak/Data:/opt/keycloak/data
+  keycloak-postgres:
+    image: postgres:18-alpine
+    container_name: keycloak-postgres
+    environment:
+      - POSTGRES_DB=keycloak
+      - POSTGRES_USER=${KEYCLOAK_DATABASE_USERNAME}
+      - POSTGRES_PASSWORD=${KEYCLOAK_DATABASE_PASSWORD}
+    ports:
+      - 5432:5432
+    volumes:
+      - .volumes/Keycloak/Postgres/:/var/lib/postgresql
+    networks:
+      - keycloak-network

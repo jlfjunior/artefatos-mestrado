@@ -1,0 +1,15 @@
+name: challenger-easyflow
+services:
+  easyflow-database:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: easyflow-database
+    ports:
+      - 14330:1433
+    environment:
+      SA_PASSWORD: P@ssw0rd!
+      ACCEPT_EULA: Y
+      MSSQL_PID: Express
+    volumes:
+      - .volumes/SQLServer/data:/var/opt/mssql/data
+      - .volumes/SQLServer/log:/var/opt/mssql/log
+      - .volumes/SQLServer/secrets:/var/opt/mssql/secrets

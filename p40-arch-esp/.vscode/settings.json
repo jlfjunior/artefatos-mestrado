@@ -1,0 +1,17 @@
+{
+    "dotnet.defaultSolution": "Challenger.EasyFlow.slnx",
+    "cSpell.ignoreWords": [
+        "ASPNETCORE",
+        "RABBITMQ",
+        "jdbc",
+        "postgres",
+        "postgresql",
+        "rabbitmq"
+    ],
+    "cSpell.words": [
+        "dotnet",
+        "easyflow",
+        "healthcheck",
+        "isready"
+    ]
+}

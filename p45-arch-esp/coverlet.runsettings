@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat Code Coverage">
+        <Configuration>
+          <Format>cobertura</Format>
+          <Include>[CashFlow.Domain]*,[CashFlow.Application]*</Include>
+          <Exclude>[*]*.Program</Exclude>
+          <Exclude>[*]*.Migrations.*</Exclude>
+          <Exclude>[CashFlow.Application]CashFlow.Application.DependencyInjection</Exclude>
+          <Exclude>[CashFlow.Contracts]CashFlow.Contracts.*</Exclude>
+          <ExcludeByFile>**/DependencyInjection.cs</ExcludeByFile>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>

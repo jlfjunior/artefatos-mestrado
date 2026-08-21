@@ -1,0 +1,19 @@
+<Solution>
+  <Folder Name="/Itens de Solução/">
+    
+    <File Path="docker-compose.yml" />
+    <File Path="FluxoCaixa.Api/banco_completo.sql" />
+  </Folder>
+  <Folder Name="/Itens de Solução/.github/" />
+  <Folder Name="/Itens de Solução/.github/workflows/">
+    <File Path="ci-cd.yml" />
+  </Folder>
+  <Project Path="../CaseFluxoCaixa/FluxoCaixa.Api/FluxoCaixa.Api.csproj" />
+  <Project Path="../CaseFluxoCaixa/FluxoCaixa.Application/FluxoCaixa.Application.csproj" />
+  <Project Path="../CaseFluxoCaixa/FluxoCaixa.Domain/FluxoCaixa.Domain.csproj" />
+  <Project Path="../CaseFluxoCaixa/FluxoCaixa.Infrastructure/FluxoCaixa.Infrastructure.csproj" />
+  <Project Path="../CaseFluxoCaixa/FluxoCaixa.Tests/FluxoCaixa.Tests.csproj" />
+  <Project Path="../CaseFluxoCaixa/FluxoCaixa.Worker/FluxoCaixa.Worker.csproj" Id="f7d8a9bb-798d-4371-ae47-e5b018308523">
+    <Build Solution="Debug|*" Project="false" />
+  </Project>
+</Solution>

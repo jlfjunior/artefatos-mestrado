@@ -1,0 +1,13 @@
+name: challenger-easyflow
+services:
+  message-broker:
+    image: rabbitmq:4.0.9-management
+    container_name: message-broker
+    ports:
+      - 5672:5672
+      - 15672:15672
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: P@ssw0rd!
+    volumes:
+      - .volumes/rabbitmq/data:/var/lib/rabbitmq

@@ -1,0 +1,22 @@
+{
+  "stryker-config": {
+    "project": "Lancamentos.Application.csproj",
+    "test-projects": [
+      "../../../tests/Lancamentos.Application.UnitTests/Lancamentos.Application.UnitTests.csproj"
+    ],
+    "project-info": {
+      "name": "FluxoCaixa/Lancamentos.Application",
+      "module": "Lancamentos.Application"
+    },
+    "reporters": [
+      "html",
+      "progress"
+    ],
+    "thresholds": {
+      "high": 80,
+      "low": 60,
+      "break": 50
+    },
+    "mutation-level": "Standard"
+  }
+}

@@ -1,0 +1,81 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: cashflow
+      POSTGRES_USER: cashflow
+      POSTGRES_PASSWORD: cashflow
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cashflow -d cashflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_port_connectivity"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+      start_period: 20s
+
+  api:
+    build:
+      context: .
+      target: api
+    ports:
+      - "8081:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      Database__ConnectionString: Host=postgres;Port=5432;Database=cashflow;Username=cashflow;Password=cashflow
+      RabbitMq__HostName: rabbitmq
+      OAuth__Issuer: http://localhost:8081
+      OAuth__SigningKeysSecret: 17fdcb2fee3f4d1fa198264321fe951717d3d245ec50484d9280c35fab548f38
+      OAuth__SigningKeysPoolSize: "2"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  consumer-consolidation:
+    build:
+      context: .
+      target: consumer-consolidation
+    restart: unless-stopped
+    environment:
+      Database__ConnectionString: Host=postgres;Port=5432;Database=cashflow;Username=cashflow;Password=cashflow
+      RabbitMq__HostName: rabbitmq
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      target: web
+    ports:
+      - "8080:8080"
+    environment:
+      ApiSettings__BaseUrl: http://api:8080
+      OAuth__TokenUrl: http://api:8080/oauth/token
+      OAuth__ClientId: cashflow.web
+      OAuth__ClientSecret: bb222c98-ead0-44cd-b12a-a54a9f6ee1a4
+    volumes:
+      - web_dataprotection:/root/.aspnet/DataProtection-Keys
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:
+  web_dataprotection:

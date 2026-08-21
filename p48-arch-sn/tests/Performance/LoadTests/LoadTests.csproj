@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>FluxoCaixa.LoadTests</RootNamespace>
+    <!-- Não é um projeto de teste do xUnit: não deve ser coletado pelo `dotnet test`. -->
+    <IsPackable>false</IsPackable>
+    <IsTestProject>false</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NBomber" Version="5.8.2" />
+    <PackageReference Include="NBomber.Http" Version="5.2.1" />
+  </ItemGroup>
+
+</Project>

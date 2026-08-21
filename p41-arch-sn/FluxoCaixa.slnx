@@ -1,0 +1,26 @@
+<Solution>
+  <Folder Name="/Itens de Solução/">
+    <File Path="docker-compose.yml" />
+  </Folder>
+  <Folder Name="/src/" />
+  <Folder Name="/src/Gateway/">
+    <Project Path="src/Gateway/Gateway/Gateway.csproj" Id="be09fb56-dd80-47d5-b2b3-765fea91429d" />
+  </Folder>
+  <Folder Name="/src/Services/" />
+  <Folder Name="/src/Services/Consolidation/">
+    <Project Path="src/Services/Consolidation/Consolidation.API/Consolidation.API.csproj" Id="0dc53026-575d-48fa-a18c-e956f120a402" />
+    <Project Path="src/Services/Consolidation/Consolidation.Application/Consolidation.Application.csproj" Id="d8ef6cc9-a899-44c9-86d6-9a7a41723eb5" />
+    <Project Path="src/Services/Consolidation/Consolidation.Domain/Consolidation.Domain.csproj" Id="a74fe2a9-f68c-4225-978e-ffef90903e48" />
+    <Project Path="src/Services/Consolidation/Consolidation.Infrastructure/Consolidation.Infrastructure.csproj" Id="2518c6cd-d251-45c1-b209-fc70bd44a662" />
+  </Folder>
+  <Folder Name="/src/Services/Entries/">
+    <Project Path="src/Services/Entries/Entries.API/Entries.API.csproj" Id="891cfbab-b617-40ed-95e6-9df7d9e3b3d5" />
+    <Project Path="src/Services/Entries/Entries.Application/Entries.Application.csproj" />
+    <Project Path="src/Services/Entries/Entries.Domain/Entries.Domain.csproj" />
+    <Project Path="src/Services/Entries/Entries.Infrastructure/Entries.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Consolidation.Tests/Consolidation.Tests.csproj" Id="e054d48f-28c5-47ae-8f05-f552ecf39db0" />
+    <Project Path="tests/Entries.Tests/Entries.Tests.csproj" Id="e1e20092-df40-4819-8765-2470b63fd4c2" />
+  </Folder>
+</Solution>

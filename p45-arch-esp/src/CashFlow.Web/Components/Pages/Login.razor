@@ -1,0 +1,87 @@
+@page "/login"
+@namespace CashFlow.Web.Components.Pages
+@layout LoginLayout
+@using CashFlow.Web.Services
+
+<PageTitle>Entrar — CashFlow</PageTitle>
+
+<div class="min-vh-100 d-flex align-items-center justify-content-center py-4">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5 col-lg-4">
+                <div class="card">
+                    <div class="card-header">Acesso ao CashFlow</div>
+                    <div class="card-body">
+                        <EditForm Model="_form" OnValidSubmit="LoginAsync">
+                            <div class="mb-3">
+                                <label class="form-label">E-mail</label>
+                                <InputText class="form-control" @bind-Value="_form.Email" autocomplete="username" />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Senha</label>
+                                <InputText type="password" class="form-control" @bind-Value="_form.Password" autocomplete="current-password" />
+                            </div>
+                            <button class="btn btn-primary w-100" type="submit" disabled="@_loading">
+                                @(_loading ? "Entrando..." : "Entrar")
+                            </button>
+                        </EditForm>
+                        @if (!string.IsNullOrEmpty(_error))
+                        {
+                            <div class="alert alert-danger mt-3 mb-0">@_error</div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Inject] protected OAuthTokenClient TokenClient { get; set; } = default!;
+    [Inject] protected AuthSession Session { get; set; } = default!;
+    [Inject] protected NavigationManager Navigation { get; set; } = default!;
+
+    protected LoginForm _form = new();
+    protected string? _error;
+    protected bool _loading;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        await Session.EnsureRestoredAsync();
+        if (Session.IsAuthenticated)
+        {
+            Navigation.NavigateTo("/", replace: true);
+        }
+    }
+
+    private async Task LoginAsync()
+    {
+        _loading = true;
+        _error = null;
+        try
+        {
+            var (token, role, userId) = await TokenClient.LoginAsync(_form.Email, _form.Password);
+            await Session.SetTokenAsync(token, role, userId);
+            Navigation.NavigateTo("/", replace: true);
+        }
+        catch (Exception ex)
+        {
+            _error = $"Falha na autenticação: {ex.Message}";
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    protected sealed class LoginForm
+    {
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+    }
+}

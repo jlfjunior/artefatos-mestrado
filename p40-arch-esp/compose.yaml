@@ -1,0 +1,10 @@
+# Please refer https://aka.ms/HTTPSinContainer on how to setup an https developer certificate for your ASP.NET Core service.
+name: challenger-easyflow
+services:
+  challengereasyflowworkers:
+    image: challengereasyflowworkers
+    build:
+      context: .
+      dockerfile: Src/Challenger.EasyFlow.Workers/Dockerfile
+    ports:
+      - 8001:8001

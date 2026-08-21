@@ -1,0 +1,14 @@
+bin/
+obj/
+*.user
+.vs/
+.idea/
+*.DotSettings.user
+TestResults/
+[Dd]ebug/
+[Rr]elease/
+artifacts/
+
+# Saída dos relatórios de mutação (Stryker.NET) e de carga (NBomber)
+StrykerOutput/
+relatorios-carga/

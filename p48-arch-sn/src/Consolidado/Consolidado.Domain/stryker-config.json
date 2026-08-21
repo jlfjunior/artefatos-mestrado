@@ -1,0 +1,22 @@
+{
+  "stryker-config": {
+    "project": "Consolidado.Domain.csproj",
+    "test-projects": [
+      "../../../tests/Consolidado.UnitTests/Consolidado.UnitTests.csproj"
+    ],
+    "project-info": {
+      "name": "FluxoCaixa/Consolidado.Domain",
+      "module": "Consolidado.Domain"
+    },
+    "reporters": [
+      "html",
+      "progress"
+    ],
+    "thresholds": {
+      "high": 80,
+      "low": 60,
+      "break": 50
+    },
+    "mutation-level": "Standard"
+  }
+}

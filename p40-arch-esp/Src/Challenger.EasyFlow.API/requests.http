@@ -1,0 +1,31 @@
+# TransactionType: 1 - Debit transaction
+# CategoryId: 1 - Sales category
+# PaymentMethodId: 2 - Credit Card payment method
+
+@BaseUrl = https://localhost:7282
+@CashBoxId = 019e8e05-4946-703c-a5ad-286baa53ffb8
+@TransactionType = 1
+@CategoryId = 1
+@PaymentMethodId = 2
+
+### Create a new transaction for a cash box
+
+POST {{BaseUrl}}/api/v1/cashboxes/{{CashBoxId}}/transactions HTTP/2
+Content-Type: application/json
+
+{
+  "cashBoxId": "{{CashBoxId}}",
+  "occurredAt": "{{$datetime iso8601}}",
+  "type": {{TransactionType}},
+  "amount": 150.99,
+  "description": "Payment for sales transaction",
+  "categoryId": {{CategoryId}},
+  "paymentMethodId": {{PaymentMethodId}}
+}
+
+###
+
+GET {{BaseUrl}}/api/v1/cashboxes/{cashBoxId}/transactions
+Accept: application/json
+
+###
