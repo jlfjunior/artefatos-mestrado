@@ -1,0 +1,271 @@
+@page "/"
+@namespace CashFlow.Web.Components.Pages
+@using CashFlow.Contracts
+@using CashFlow.Web.Services
+
+<PageTitle>Fluxo de Caixa — CashFlow</PageTitle>
+
+@if (!_ready)
+{
+    <p class="text-muted py-3">Carregando...</p>
+}
+else
+{
+
+<h1>Controle de Fluxo de Caixa</h1>
+@if (!string.IsNullOrEmpty(_loadError))
+{
+    <div class="alert alert-danger">@_loadError</div>
+}
+<p class="text-muted">
+    Perfil: @(Session.IsEmployee ? "Funcionário" : "Cliente")
+</p>
+
+<div class="row g-4">
+    @if (Session.IsEmployee)
+    {
+        <div class="col-lg-5">
+            <div class="card">
+                <div class="card-header">Novo lançamento</div>
+                <div class="card-body">
+                    <EditForm Model="_form" OnValidSubmit="CreateAsync">
+                        <div class="mb-3">
+                            <label class="form-label">Cliente</label>
+                            <InputSelect class="form-select" @bind-Value="_selectedUserId">
+                                @foreach (var client in _clients ?? [])
+                                {
+                                    <option value="@client.Id">@client.FullName</option>
+                                }
+                            </InputSelect>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Descrição</label>
+                            <InputText class="form-control" @bind-Value="_form.Description" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Tipo</label>
+                            <InputSelect class="form-select" @bind-Value="_form.EntryType">
+                                <option value="Credit">Crédito</option>
+                                <option value="Debit">Débito</option>
+                            </InputSelect>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Valor</label>
+                            <InputNumber class="form-control" @bind-Value="_form.Amount" />
+                        </div>
+                        <button class="btn btn-primary" type="submit" disabled="@_loading">Salvar</button>
+                    </EditForm>
+                    @if (!string.IsNullOrEmpty(_message))
+                    {
+                        <div class="alert alert-info mt-3">@_message</div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="@(Session.IsEmployee ? "col-lg-7" : "col-lg-12")">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Saldo consolidado</span>
+                @if (Session.IsEmployee)
+                {
+                    <div>
+                        <InputSelect class="form-select form-select-sm d-inline-block w-auto" @bind-Value="_selectedUserId">
+                            @foreach (var client in _clients ?? [])
+                            {
+                                <option value="@client.Id">@client.FullName</option>
+                            }
+                        </InputSelect>
+                        <InputDate class="form-control form-control-sm d-inline-block w-auto ms-2" @bind-Value="_balanceDate" />
+                        <button class="btn btn-sm btn-outline-secondary ms-2" @onclick="LoadBalanceAsync">Consultar</button>
+                    </div>
+                }
+                else
+                {
+                    <div>
+                        <InputDate class="form-control form-control-sm d-inline-block w-auto" @bind-Value="_balanceDate" />
+                        <button class="btn btn-sm btn-outline-secondary ms-2" @onclick="LoadBalanceAsync">Consultar</button>
+                    </div>
+                }
+            </div>
+            <div class="card-body">
+                @if (_balance is null)
+                {
+                    <p class="text-muted">Selecione uma data para consultar.</p>
+                }
+                else
+                {
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Créditos</dt>
+                        <dd class="col-sm-8">@_balance.TotalCredits.ToString("C")</dd>
+                        <dt class="col-sm-4">Débitos</dt>
+                        <dd class="col-sm-8">@_balance.TotalDebits.ToString("C")</dd>
+                        <dt class="col-sm-4">Saldo</dt>
+                        <dd class="col-sm-8 fw-bold">@_balance.Balance.ToString("C")</dd>
+                    </dl>
+                }
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <span>Lançamentos</span>
+                <button class="btn btn-sm btn-outline-primary" @onclick="LoadTransactionsAsync">Atualizar</button>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-striped mb-0">
+                    <thead>
+                        <tr>
+                            @if (Session.IsEmployee)
+                            {
+                                <th>Cliente</th>
+                            }
+                            <th>Data</th>
+                            <th>Descrição</th>
+                            <th>Tipo</th>
+                            <th class="text-end">Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (_transactions is null || _transactions.Count == 0)
+                        {
+                            <tr><td colspan="@(Session.IsEmployee ? 5 : 4)" class="text-center text-muted p-3">Nenhum lançamento.</td></tr>
+                        }
+                        else
+                        {
+                            @foreach (var item in _transactions)
+                            {
+                                <tr>
+                                    @if (Session.IsEmployee)
+                                    {
+                                        <td>@ResolveUserName(item.UserId)</td>
+                                    }
+                                    <td>@item.TransactionDate.ToString("dd/MM/yyyy")</td>
+                                    <td>@item.Description</td>
+                                    <td>@(item.EntryType == "Credit" ? "Crédito" : "Débito")</td>
+                                    <td class="text-end">@item.Amount.ToString("C")</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+}
+
+@code {
+    [Inject] protected CashFlowApiClient ApiClient { get; set; } = default!;
+    [Inject] protected AuthSession Session { get; set; } = default!;
+    [Inject] protected NavigationManager Navigation { get; set; } = default!;
+
+    protected readonly TransactionForm _form = new();
+    protected Guid _selectedUserId;
+    protected DateTime _balanceDate = DateTime.Today;
+    protected IReadOnlyList<ClientResponse>? _clients;
+    protected IReadOnlyList<TransactionResponse>? _transactions;
+    protected BalanceResponse? _balance;
+    protected string? _message;
+    protected string? _loadError;
+    protected bool _loading;
+    protected bool _ready;
+    protected bool _initialized;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender || _initialized)
+        {
+            return;
+        }
+
+        _initialized = true;
+
+        await Session.EnsureRestoredAsync();
+        if (!Session.IsAuthenticated)
+        {
+            Navigation.NavigateTo("/login");
+            return;
+        }
+
+        try
+        {
+            if (Session.IsEmployee)
+            {
+                _clients = await ApiClient.GetClientsAsync();
+                _selectedUserId = _clients?.FirstOrDefault()?.Id ?? Guid.Empty;
+            }
+            else
+            {
+                _selectedUserId = Session.UserId;
+            }
+
+            await LoadTransactionsAsync();
+            await LoadBalanceAsync();
+            _ready = true;
+        }
+        catch (Exception ex)
+        {
+            _loadError = $"Não foi possível carregar os dados: {ex.Message}";
+            _ready = true;
+        }
+
+        StateHasChanged();
+    }
+
+    private async Task LoadTransactionsAsync()
+    {
+        _transactions = await ApiClient.GetTransactionsAsync();
+    }
+
+    private async Task LoadBalanceAsync()
+    {
+        if (_selectedUserId == Guid.Empty)
+        {
+            return;
+        }
+
+        _balance = await ApiClient.GetBalanceAsync(_selectedUserId, DateOnly.FromDateTime(_balanceDate));
+    }
+
+    private async Task CreateAsync()
+    {
+        _loading = true;
+        _message = null;
+        try
+        {
+            var request = new CreateTransactionRequest(
+                _selectedUserId,
+                _form.Description,
+                _form.Amount,
+                _form.EntryType);
+
+            await ApiClient.CreateTransactionAsync(request);
+            _message = "Lançamento criado. O consolidado será atualizado em instantes.";
+            _form.Description = string.Empty;
+            _form.Amount = 0;
+            await LoadTransactionsAsync();
+            await Task.Delay(500);
+            await LoadBalanceAsync();
+        }
+        catch (Exception ex)
+        {
+            _message = $"Erro: {ex.Message}";
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private string ResolveUserName(Guid userId) =>
+        _clients?.FirstOrDefault(c => c.Id == userId)?.FullName ?? userId.ToString("D");
+
+    protected sealed class TransactionForm
+    {
+        public string Description { get; set; } = string.Empty;
+        public decimal Amount { get; set; }
+        public string EntryType { get; set; } = "Credit";
+    }
+}

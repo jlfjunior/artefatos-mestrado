@@ -1,8 +1,0 @@
-# Desenvolvimento local — senha alinhada a ELASTIC_PASSWORD no docker-compose.
-apm-server:
-  host: "0.0.0.0:8200"
-
-output.elasticsearch:
-  hosts: ["http://elasticsearch:9200"]
-  username: "elastic"
-  password: "changeme"

@@ -1,32 +1,41 @@
-# SonarQube
-.sonarqube/
-.sonar/
-coverage.opencover.xml
-TestResults/
-
-# .NET Build artifacts
+# .NET
 bin/
 obj/
-*.exe
-*.dll
-*.pdb
 *.user
 *.suo
-*.sln.docstates
-
-# Visual Studio
+*.vs/
 .vs/
-.idea/
+*.log
+*.cache
+TestResults/
+coverage/
+*.ncrunch*
+launchSettings.json
 
-# OS files
+# Secrets / configurações locais
+appsettings.Local.json
+appsettings.Development.json
+*.pfx
+*.p12
+secrets.json
+
+# Docker
+.dockerignore
+
+# Node / Angular
+frontend/**/node_modules/
+frontend/**/.angular/
+frontend/**/dist/
+frontend/**/*.js.map
+frontend/**/coverage/
+frontend/**/.env
+
+# OS
 .DS_Store
 Thumbs.db
+desktop.ini
 
-# User specific files
-*.user
-*.userosscache
-*.sln.docstates
-
-# Rider
+# IDE
 .idea/
-*.sln.iml
+*.swp
+*.swo

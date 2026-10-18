@@ -1,203 +1,164 @@
-# Fluxo de Caixa — Carrefour Banco
+﻿# CashFlow — Desafio de Arquitetura de Software
 
-Sistema de controle de fluxo de caixa desenvolvido como desafio técnico. Implementa uma arquitetura de microsserviços com comunicação assíncrona via mensageria, garantindo que o serviço de lançamentos permaneça disponível mesmo quando o serviço de consolidado estiver temporariamente indisponível.
+Sistema de controle de fluxo de caixa com arquitetura de microsserviços, SOLID, design patterns e alta disponibilidade.
 
-## Stack
+## O Problema
 
-| Camada | Tecnologia |
-|---|---|
-| Backend | .NET 9 / C# |
-| Arquitetura | Clean Architecture · DDD · CQRS (MediatR) · Microsserviços |
-| Mensageria | MassTransit + RabbitMQ |
-| Cache | Redis (TTL 60s) |
-| Banco de Dados | SQL Server (EF Core 9 · Code First Migrations) |
-| API Gateway | YARP (Yet Another Reverse Proxy) |
-| Frontend | Angular 18 (Standalone Components) |
-| Testes | xUnit · FluentAssertions · Moq (38 testes) |
-| Infraestrutura | Docker + Docker Compose |
-| Resiliência | Polly (Retry com backoff exponencial) · Health Checks |
-| Segurança | JWT Bearer · Rate Limiting (sliding window) |
-| Observabilidade | Serilog (structured logging) |
+Uma empresa precisa de um sistema para controlar o fluxo de caixa diário — registrar débitos e créditos — e gerar um relatório consolidado do saldo do dia. O serviço de consolidação **não pode** impactar o serviço de lançamentos: se o consolidado cair, lançamentos continuam funcionando.
 
----
+## Arquitetura
 
-## Pré-requisitos
+```
+┌─────────────────────────────────────────────────────────────┐
+│                         API Gateway                         │
+│              (Rate Limiting • Auth JWT • Routing)           │
+└────────────────┬────────────────────┬───────────────────────┘
+                 │                    │
+    ┌────────────▼──────────┐  ┌──────▼──────────────────┐
+    │     EntryService      │  │   ConsolidationService  │
+    │  POST /api/entries    │  │  GET /api/consolidation │
+    │  GET  /api/entries    │  │  (saldo diário)         │
+    │                       │  │                         │
+    │  ┌─────────────────┐  │  │  ┌───────────────────┐  │
+    │  │  PostgreSQL DB  │  │  │  │   PostgreSQL DB   │  │
+    │  │  (entries)      │  │  │  │  (consolidation)  │  │
+    │  └─────────────────┘  │  │  └───────────────────┘  │
+    │  ┌─────────────────┐  │  │  ┌───────────────────┐  │
+    │  │  Outbox Table   │──┼──┼─►│  RabbitMQ         │  │
+    │  └─────────────────┘  │  │  │  Consumer         │  │
+    └───────────────────────┘  └─────────────────────────┘
+                 │                         ▲
+                 └──── RabbitMQ ───────────┘
+                    (EntryCreated event)
+```
 
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- [Node.js 18+](https://nodejs.org/) (para o frontend)
-- [k6](https://k6.io/docs/get-started/installation/) (opcional, para teste de carga)
+### Decisões de arquitetura
 
----
+| Decisão | Escolha | Motivo |
+|---------|---------|--------|
+| Padrão | Clean Architecture + CQRS | Separação de responsabilidades, testabilidade |
+| Comunicação | RabbitMQ (async) | Desacopla serviços; consolidado pode cair |
+| Confiabilidade | Outbox Pattern | Garante entrega mesmo se broker cair |
+| Resiliência | Polly Circuit Breaker | Impede cascata de falhas |
+| ORM | EF Core + Repository | Abstração de persistência, migrations |
+| Auth | JWT Bearer | Stateless, escalável horizontalmente |
+| Testes | xUnit + Moq + FluentAssertions | Amplamente adotados no ecossistema .NET |
 
-## Como Executar
+## Requisitos Não-Funcionais
 
-### Opção 1 — Docker Compose (recomendado)
+- **Throughput:** 50 req/s no pico
+- **Perda máxima:** ≤ 5% de lançamentos
+- **Disponibilidade:** Consolidado pode falhar sem afetar lançamentos
+- **Segurança:** JWT obrigatório em todos os endpoints, rate limiting por IP
+- **Observabilidade:** traces distribuídos (OpenTelemetry), logs estruturados (Serilog)
 
-Sobe todos os microsserviços, banco, mensageria e cache com um único comando:
+> **Rate limiting vs. throughput:** o rate limiter está configurado em 50 req/10 s **por IP** como proteção contra abuso (DoS). A capacidade total de 50 req/s é atingida com múltiplos clientes simultâneos e/ou escalonando horizontalmente os serviços (`docker compose up --scale entry-service=N`). Os dois conceitos são independentes: o rate limit protege cada IP individualmente; o throughput agrega todas as instâncias.
+
+## Como rodar
 
 ```bash
-docker compose up --build -d
+docker compose up --build
 ```
 
-Em seguida, inicie o frontend:
+Swagger UI disponível em desenvolvimento:
+- EntryService: http://localhost:5001/swagger
+- ConsolidationService: http://localhost:5002/swagger
 
-```bash
-cd frontend/fluxo-caixa-web
-npm install
-npm start
-```
+Obtenha um token JWT em `POST /api/auth/token` (credenciais: `dev` / `dev`) e use o botão **Authorize** no Swagger UI.
 
-### Opção 2 — Execução local (.NET CLI)
+## Endpoints
 
-```bash
-# Terminal 1 — Infraestrutura
-docker compose up -d sqlserver rabbitmq redis
-
-# Terminal 2 — API de Lançamentos (porta 5001)
-cd src/Services/FluxoCaixa.Lancamentos.Api
-dotnet run
-
-# Terminal 3 — API do Consolidado (porta 5002)
-cd src/Services/FluxoCaixa.Consolidado.Api
-dotnet run
-
-# Terminal 4 — API Gateway (porta 5000)
-cd src/Gateway/FluxoCaixa.Gateway
-dotnet run
-
-# Terminal 5 — Frontend
-cd frontend/fluxo-caixa-web
-npm install
-npm start
-```
-
-> As migrations são aplicadas automaticamente na inicialização de cada serviço.
-
----
-
-## URLs de Acesso
-
-| Recurso | URL |
-|---|---|
-| Frontend | http://localhost:4200 |
-| Gateway (entry point da API) | http://localhost:5000 |
-| Swagger — Lançamentos | http://localhost:5001/swagger |
-| Swagger — Consolidado | http://localhost:5002/swagger |
-| RabbitMQ Management | http://localhost:15672 (guest / guest) |
-
----
-
-## Autenticação
-
-Todos os endpoints exigem autenticação JWT. Para obter um token:
-
-```bash
-curl -X POST http://localhost:5000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{ "email": "comerciante@teste.com", "senha": "Senha@123" }'
-```
-
-> **Nota:** as credenciais são fixas para este desafio técnico. Em produção, a autenticação utilizaria um provedor de identidade (Keycloak, Azure AD B2C ou similar).
-
-Use o token retornado no header de todas as requisições:
+### EntryService (porta 5001)
 
 ```
-Authorization: Bearer <token>
+POST /api/entries         — registrar débito ou crédito
+GET  /api/entries?date=   — listar lançamentos do dia
+POST /api/auth/token          — [DEV] gerar token JWT
 ```
 
----
+### ConsolidationService (porta 5002)
 
-## Contratos de API
-
-### Lançamentos
-
-| Método | Endpoint | Descrição |
-|---|---|---|
-| `POST` | `/api/lancamentos` | Registra um novo lançamento |
-| `GET` | `/api/lancamentos?data=yyyy-MM-dd` | Lista lançamentos do dia |
-
-**Payload de criação:**
-```json
-{
-  "descricao": "Venda balcão",
-  "valor": 150.00,
-  "tipo": "CREDITO",
-  "dataHora": "2026-03-30T13:00:00Z"
-}
 ```
-
-### Consolidado
-
-| Método | Endpoint | Descrição |
-|---|---|---|
-| `GET` | `/api/consolidado/{data}` | Saldo consolidado de um dia |
-| `GET` | `/api/consolidado/range?inicio=&fim=` | Saldo consolidado de um período |
-
----
-
-## Testes
-
-### Testes Unitários (38 testes · 100% aprovados)
-
-```bash
-dotnet test
+GET /api/consolidation?date=    — saldo consolidado do dia
 ```
-
-| Projeto | Testes |
-|---|---|
-| `FluxoCaixa.Lancamentos.Tests` | 21 — domínio + command handlers + query handlers |
-| `FluxoCaixa.Consolidado.Tests` | 17 — domínio + query handlers + event consumer |
-
-### Teste de Carga (k6)
-
-Valida o requisito de 50 req/s com menos de 5% de erros no serviço de consolidado.
-
-```bash
-k6 run ./k6/consolidado_pico.js
-```
-
-| Métrica | Meta |
-|---|---|
-| Taxa de erros | < 5% |
-| Latência p95 | < 200ms |
-| Latência p99 | < 500ms |
-| Throughput mínimo | ≥ 47,5 req/s |
-
----
 
 ## Estrutura do Projeto
 
 ```
-/FluxoCaixa
-├── src/
-│   ├── Services/
-│   │   ├── FluxoCaixa.Lancamentos.*/     ← Microsserviço 1 (Domain/Application/Infrastructure/Api)
-│   │   └── FluxoCaixa.Consolidado.*/     ← Microsserviço 2 (Domain/Application/Infrastructure/Api)
-│   └── Gateway/
-│       └── FluxoCaixa.Gateway/           ← YARP Gateway (JWT, CORS, Rate Limiting, Auth)
-├── frontend/
-│   └── fluxo-caixa-web/                  ← Angular 18 SPA
-├── tests/
-│   ├── FluxoCaixa.Lancamentos.Tests/     ← 21 testes unitários
-│   └── FluxoCaixa.Consolidado.Tests/     ← 17 testes unitários
-├── k6/
-│   └── consolidado_pico.js               ← Teste de carga (50 req/s)
-├── docker-compose.yml
-├── arquitetura_fluxo_caixa.md            ← Documentação técnica completa
-└── README.md
+src/
+├── CashFlow.SharedKernel/             — contratos compartilhados, eventos de domínio
+├── CashFlow.EntryService/             — serviço de lançamentos
+│   ├── Domain/                        — entidades, regras de negócio
+│   ├── Application/                   — CQRS: commands, queries, handlers
+│   ├── Infrastructure/                — EF Core, RabbitMQ, Outbox
+│   └── Endpoints/                     — Minimal API endpoints
+├── CashFlow.ConsolidationService/     — serviço de consolidação diária
+│   ├── Domain/
+│   ├── Application/
+│   ├── Infrastructure/
+│   └── Endpoints/
+└── Tests/
+    ├── CashFlow.EntryService.Tests/
+    └── CashFlow.ConsolidationService.Tests/
 ```
+
+## Cobertura de Testes
+
+Objetivo: ≥ 80% nos handlers de Application. Rodar com:
+
+```bash
+dotnet test src/CashFlow.sln --collect:"XPlat Code Coverage"
+```
+
+## Configuração de Produção
+
+### Autenticação JWT
+
+| Configuração | Desenvolvimento | Produção |
+|---|---|---|
+| `Jwt:Key` | Valor fixo em `appsettings.json` | Variável de ambiente ou secrets manager¹ |
+| Emissor de tokens | `POST /api/auth/token` (dev only) | IDP externo² |
+| Rotação de chaves | Não aplicável | Rotacionar periodicamente via secrets manager |
+
+¹ AWS Secrets Manager, Azure Key Vault, HashiCorp Vault ou equivalente. A chave deve ter **no mínimo 256 bits** e nunca deve ser versionada em repositório.
+
+² Em produção, remova a dependência do endpoint `/api/auth/token` (já desabilitado fora de `IsDevelopment()`) e configure o `JwtBearer` com `Authority` apontando para o IDP:
+
+```csharp
+opt.Authority = "https://seu-idp.exemplo.com";
+opt.Audience  = "cashflow-clients";
+// Remova IssuerSigningKey — o middleware buscará as chaves públicas do IDP via OIDC discovery
+```
+
+Provedores recomendados: **Keycloak** (self-hosted), **Azure AD B2C**, **Auth0**.
 
 ---
 
-## Decisões Arquiteturais
+### Observabilidade (OpenTelemetry)
 
-Consulte [`README_arquitetura_fluxo_caixa.md`](./README_arquitetura_fluxo_caixa.md) para a documentação técnica completa, incluindo:
+Em desenvolvimento os traces são exportados para o console. Em produção, substitua o exporter em `TelemetryExtensions.cs`:
 
-- Justificativa da separação em microsserviços com mensageria assíncrona
-- Decisões sobre CQRS, DDD e Clean Architecture
-- Diagrama de componentes e fluxo de eventos
-- Estratégia de resiliência (Polly, Health Checks, idempotência via `ProcessedEvent`)
-- Tratamento de race condition com `MERGE SQL + HOLDLOCK` para consistência do consolidado
-- Estratégia de cache Redis com invalidação orientada a evento
-- Plano de testes (unitários, integração, carga, E2E)
-- Melhorias futuras (Outbox Pattern, OpenTelemetry, Kubernetes HPA)
+**1. Adicione o pacote OTLP:**
+```bash
+dotnet add package OpenTelemetry.Exporter.OpenTelemetryProtocol
+```
+
+**2. Troque `AddConsoleExporter()` por `AddOtlpExporter()`:**
+```csharp
+.WithTracing(tracing => tracing
+    .AddAspNetCoreInstrumentation()
+    .AddHttpClientInstrumentation()
+    .AddOtlpExporter(opts =>
+        opts.Endpoint = new Uri(configuration["Otel:Endpoint"]!)))
+```
+
+**3. Configure a variável de ambiente:**
+```yaml
+# docker-compose (produção)
+OTEL__ENDPOINT: "http://jaeger:4317"   # Jaeger
+# ou
+OTEL__ENDPOINT: "http://tempo:4317"    # Grafana Tempo
+# ou use o endpoint OTLP do Datadog / New Relic / Dynatrace
+```
+
+Backends recomendados: **Jaeger** ou **Grafana Tempo** (self-hosted), **Datadog**, **New Relic**.

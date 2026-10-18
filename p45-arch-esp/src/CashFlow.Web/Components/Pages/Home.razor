@@ -1,271 +1,218 @@
-@page "/"
-@namespace CashFlow.Web.Components.Pages
-@using CashFlow.Contracts
-@using CashFlow.Web.Services
+﻿@page "/"
+@rendermode InteractiveServer
+@inject AuthApiClient AuthApiClient
+@inject NavigationManager NavigationManager
+@inject SessionStore SessionStore
+@inject AuthenticatedSessionService AuthenticatedSessionService
+@inject OAuthLoginService OAuthLoginService
+@inject IOptions<DemoAccountOptions> DemoAccountOptions
+@inject IJSRuntime JsRuntime
 
-<PageTitle>Fluxo de Caixa — CashFlow</PageTitle>
+<PageTitle>Login</PageTitle>
 
-@if (!_ready)
+@if (isCheckingSession)
 {
-    <p class="text-muted py-3">Carregando...</p>
+	<div class="card shadow-sm">
+		<div class="card-body">
+			<h2 class="h5 mb-2">Checking session</h2>
+			<p class="text-body-secondary mb-0">Restoring your sign-in state...</p>
+		</div>
+	</div>
 }
 else
 {
+	<div class="row justify-content-center">
+		<div class="col-lg-6">
+			<div class="card shadow-sm">
+				<div class="card-body p-4">
+					<h2 class="h4 mb-2">@(isMfaStep ? "Verify MFA" : "Sign in")</h2>
+					<p class="text-body-secondary mb-4">
+						@(isMfaStep
+							? (string.Equals(loginRequest.ChallengeName, "LOCAL_MFA", StringComparison.OrdinalIgnoreCase)
+								? "Enter the local MFA code shown below the sign-in form."
+								: "Enter the MFA code sent to your Cognito user.")
+							: OAuthLoginService.IsEnabled
+								? "Use OAuth2 Hosted UI or sign in with email and password."
+								: "Use your email and password to access protected areas.")
+					</p>
 
-<h1>Controle de Fluxo de Caixa</h1>
-@if (!string.IsNullOrEmpty(_loadError))
-{
-    <div class="alert alert-danger">@_loadError</div>
-}
-<p class="text-muted">
-    Perfil: @(Session.IsEmployee ? "Funcionário" : "Cliente")
-</p>
+					@if (OAuthLoginService.IsEnabled && !isMfaStep)
+					{
+						<button class="btn btn-outline-primary w-100 mb-3" type="button" disabled="@isSubmitting" @onclick="BeginOAuthSignInAsync">
+							Sign in with Hosted UI (OAuth2)
+						</button>
+						<div class="text-center text-body-secondary small mb-3">or continue with password</div>
+					}
 
-<div class="row g-4">
-    @if (Session.IsEmployee)
-    {
-        <div class="col-lg-5">
-            <div class="card">
-                <div class="card-header">Novo lançamento</div>
-                <div class="card-body">
-                    <EditForm Model="_form" OnValidSubmit="CreateAsync">
-                        <div class="mb-3">
-                            <label class="form-label">Cliente</label>
-                            <InputSelect class="form-select" @bind-Value="_selectedUserId">
-                                @foreach (var client in _clients ?? [])
-                                {
-                                    <option value="@client.Id">@client.FullName</option>
-                                }
-                            </InputSelect>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Descrição</label>
-                            <InputText class="form-control" @bind-Value="_form.Description" />
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Tipo</label>
-                            <InputSelect class="form-select" @bind-Value="_form.EntryType">
-                                <option value="Credit">Crédito</option>
-                                <option value="Debit">Débito</option>
-                            </InputSelect>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Valor</label>
-                            <InputNumber class="form-control" @bind-Value="_form.Amount" />
-                        </div>
-                        <button class="btn btn-primary" type="submit" disabled="@_loading">Salvar</button>
-                    </EditForm>
-                    @if (!string.IsNullOrEmpty(_message))
-                    {
-                        <div class="alert alert-info mt-3">@_message</div>
-                    }
-                </div>
-            </div>
-        </div>
-    }
+					@if (!string.IsNullOrWhiteSpace(errorMessage))
+					{
+						<div class="alert alert-danger" role="alert">@errorMessage</div>
+					}
 
-    <div class="@(Session.IsEmployee ? "col-lg-7" : "col-lg-12")">
-        <div class="card mb-4">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <span>Saldo consolidado</span>
-                @if (Session.IsEmployee)
-                {
-                    <div>
-                        <InputSelect class="form-select form-select-sm d-inline-block w-auto" @bind-Value="_selectedUserId">
-                            @foreach (var client in _clients ?? [])
-                            {
-                                <option value="@client.Id">@client.FullName</option>
-                            }
-                        </InputSelect>
-                        <InputDate class="form-control form-control-sm d-inline-block w-auto ms-2" @bind-Value="_balanceDate" />
-                        <button class="btn btn-sm btn-outline-secondary ms-2" @onclick="LoadBalanceAsync">Consultar</button>
-                    </div>
-                }
-                else
-                {
-                    <div>
-                        <InputDate class="form-control form-control-sm d-inline-block w-auto" @bind-Value="_balanceDate" />
-                        <button class="btn btn-sm btn-outline-secondary ms-2" @onclick="LoadBalanceAsync">Consultar</button>
-                    </div>
-                }
-            </div>
-            <div class="card-body">
-                @if (_balance is null)
-                {
-                    <p class="text-muted">Selecione uma data para consultar.</p>
-                }
-                else
-                {
-                    <dl class="row mb-0">
-                        <dt class="col-sm-4">Créditos</dt>
-                        <dd class="col-sm-8">@_balance.TotalCredits.ToString("C")</dd>
-                        <dt class="col-sm-4">Débitos</dt>
-                        <dd class="col-sm-8">@_balance.TotalDebits.ToString("C")</dd>
-                        <dt class="col-sm-4">Saldo</dt>
-                        <dd class="col-sm-8 fw-bold">@_balance.Balance.ToString("C")</dd>
-                    </dl>
-                }
-            </div>
-        </div>
+					@if (isMfaStep)
+					{
+						<EditForm Model="loginRequest" OnValidSubmit="HandleMfaSubmitAsync" FormName="MfaForm">
+							<DataAnnotationsValidator />
+							<ValidationSummary class="text-danger mb-3" />
 
-        <div class="card">
-            <div class="card-header d-flex justify-content-between">
-                <span>Lançamentos</span>
-                <button class="btn btn-sm btn-outline-primary" @onclick="LoadTransactionsAsync">Atualizar</button>
-            </div>
-            <div class="card-body p-0">
-                <table class="table table-striped mb-0">
-                    <thead>
-                        <tr>
-                            @if (Session.IsEmployee)
-                            {
-                                <th>Cliente</th>
-                            }
-                            <th>Data</th>
-                            <th>Descrição</th>
-                            <th>Tipo</th>
-                            <th class="text-end">Valor</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (_transactions is null || _transactions.Count == 0)
-                        {
-                            <tr><td colspan="@(Session.IsEmployee ? 5 : 4)" class="text-center text-muted p-3">Nenhum lançamento.</td></tr>
-                        }
-                        else
-                        {
-                            @foreach (var item in _transactions)
-                            {
-                                <tr>
-                                    @if (Session.IsEmployee)
-                                    {
-                                        <td>@ResolveUserName(item.UserId)</td>
-                                    }
-                                    <td>@item.TransactionDate.ToString("dd/MM/yyyy")</td>
-                                    <td>@item.Description</td>
-                                    <td>@(item.EntryType == "Credit" ? "Crédito" : "Débito")</td>
-                                    <td class="text-end">@item.Amount.ToString("C")</td>
-                                </tr>
-                            }
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
+							<div class="mb-4">
+								<label class="form-label" for="mfaCode">MFA code</label>
+								<InputText id="mfaCode" class="form-control" @bind-Value="loginRequest.MfaCode" />
+							</div>
+
+							<div class="d-flex gap-2">
+								<button class="btn btn-primary flex-grow-1" type="submit" disabled="@isSubmitting">
+									@(isSubmitting ? "Verifying..." : "Verify code")
+								</button>
+								<button class="btn btn-outline-secondary" type="button" disabled="@isSubmitting" @onclick="ResetMfaStep">
+									Back
+								</button>
+							</div>
+						</EditForm>
+					}
+					else
+					{
+						<EditForm Model="loginRequest" OnValidSubmit="HandleSubmitAsync" FormName="LoginForm">
+							<DataAnnotationsValidator />
+							<ValidationSummary class="text-danger mb-3" />
+
+							<div class="mb-3">
+								<label class="form-label" for="email">Email</label>
+								<InputText id="email" class="form-control" @bind-Value="loginRequest.Email" />
+							</div>
+
+							<div class="mb-4">
+								<label class="form-label" for="password">Password</label>
+								<InputText id="password" class="form-control" @bind-Value="loginRequest.Password" type="password" />
+							</div>
+
+							<button class="btn btn-primary w-100" type="submit" disabled="@isSubmitting">
+								@(isSubmitting ? "Signing in..." : "Sign in")
+							</button>
+						</EditForm>
+
+						<p class="text-body-secondary small mt-4 mb-0">
+							@DemoAccountOptions.Value.Description<br />
+							Account: <strong>@DemoAccountOptions.Value.Email</strong> / <strong>@DemoAccountOptions.Value.Password</strong>
+							@if (DemoAccountOptions.Value.MfaCode is { Length: > 0 } mfaCode)
+							{
+								<br />
+								<span>MFA code: <strong>@mfaCode</strong></span>
+							}
+						</p>
+					}
+				</div>
+			</div>
+		</div>
+	</div>
 }
 
 @code {
-    [Inject] protected CashFlowApiClient ApiClient { get; set; } = default!;
-    [Inject] protected AuthSession Session { get; set; } = default!;
-    [Inject] protected NavigationManager Navigation { get; set; } = default!;
+	[SupplyParameterFromForm(FormName = "LoginForm")]
+	private LoginRequest loginRequest { get; set; } = new();
 
-    protected readonly TransactionForm _form = new();
-    protected Guid _selectedUserId;
-    protected DateTime _balanceDate = DateTime.Today;
-    protected IReadOnlyList<ClientResponse>? _clients;
-    protected IReadOnlyList<TransactionResponse>? _transactions;
-    protected BalanceResponse? _balance;
-    protected string? _message;
-    protected string? _loadError;
-    protected bool _loading;
-    protected bool _ready;
-    protected bool _initialized;
+	private bool isCheckingSession = true;
+	private bool isSubmitting;
+	private bool isMfaStep;
+	private string? errorMessage;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (!firstRender || _initialized)
-        {
-            return;
-        }
+	protected override void OnParametersSet()
+	{
+		loginRequest ??= new();
+	}
 
-        _initialized = true;
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		if (!firstRender)
+		{
+			return;
+		}
 
-        await Session.EnsureRestoredAsync();
-        if (!Session.IsAuthenticated)
-        {
-            Navigation.NavigateTo("/login");
-            return;
-        }
+		var storedSession = await AuthenticatedSessionService.RestoreSessionAsync();
+		if (storedSession is not null)
+		{
+			NavigationManager.NavigateTo("/dashboard");
+			return;
+		}
 
-        try
-        {
-            if (Session.IsEmployee)
-            {
-                _clients = await ApiClient.GetClientsAsync();
-                _selectedUserId = _clients?.FirstOrDefault()?.Id ?? Guid.Empty;
-            }
-            else
-            {
-                _selectedUserId = Session.UserId;
-            }
+		isCheckingSession = false;
+		StateHasChanged();
+	}
 
-            await LoadTransactionsAsync();
-            await LoadBalanceAsync();
-            _ready = true;
-        }
-        catch (Exception ex)
-        {
-            _loadError = $"Não foi possível carregar os dados: {ex.Message}";
-            _ready = true;
-        }
+	private async Task HandleSubmitAsync()
+	{
+		isSubmitting = true;
+		errorMessage = null;
+		loginRequest.ChallengeSession = null;
+		loginRequest.ChallengeName = null;
+		loginRequest.MfaCode = null;
 
-        StateHasChanged();
-    }
+		var result = await AuthApiClient.LoginAsync(loginRequest);
+		if (result.RequiresMfa)
+		{
+			loginRequest.ChallengeSession = result.ChallengeSession;
+			loginRequest.ChallengeName = result.ChallengeName;
+			isMfaStep = true;
+			errorMessage = result.ErrorMessage;
+			isSubmitting = false;
+			return;
+		}
 
-    private async Task LoadTransactionsAsync()
-    {
-        _transactions = await ApiClient.GetTransactionsAsync();
-    }
+		if (!await CompleteLoginAsync(result))
+		{
+			isSubmitting = false;
+		}
+	}
 
-    private async Task LoadBalanceAsync()
-    {
-        if (_selectedUserId == Guid.Empty)
-        {
-            return;
-        }
+	private async Task HandleMfaSubmitAsync()
+	{
+		isSubmitting = true;
+		errorMessage = null;
 
-        _balance = await ApiClient.GetBalanceAsync(_selectedUserId, DateOnly.FromDateTime(_balanceDate));
-    }
+		if (!await CompleteLoginAsync(await AuthApiClient.LoginAsync(loginRequest)))
+		{
+			isSubmitting = false;
+		}
+	}
 
-    private async Task CreateAsync()
-    {
-        _loading = true;
-        _message = null;
-        try
-        {
-            var request = new CreateTransactionRequest(
-                _selectedUserId,
-                _form.Description,
-                _form.Amount,
-                _form.EntryType);
+	private async Task<bool> CompleteLoginAsync(LoginResult result)
+	{
+		if (!result.Succeeded || result.Session is null || string.IsNullOrWhiteSpace(result.Token))
+		{
+			errorMessage = result.ErrorMessage ?? "Authentication failed.";
+			return false;
+		}
 
-            await ApiClient.CreateTransactionAsync(request);
-            _message = "Lançamento criado. O consolidado será atualizado em instantes.";
-            _form.Description = string.Empty;
-            _form.Amount = 0;
-            await LoadTransactionsAsync();
-            await Task.Delay(500);
-            await LoadBalanceAsync();
-        }
-        catch (Exception ex)
-        {
-            _message = $"Erro: {ex.Message}";
-        }
-        finally
-        {
-            _loading = false;
-        }
-    }
+		await SessionStore.SaveAsync(new StoredSession
+		{
+			Token = result.Token,
+			RefreshToken = result.RefreshToken,
+			Email = result.Session.Email,
+			DisplayName = result.Session.DisplayName,
+			ExpiresAtUtc = result.Session.ExpiresAtUtc
+		});
 
-    private string ResolveUserName(Guid userId) =>
-        _clients?.FirstOrDefault(c => c.Id == userId)?.FullName ?? userId.ToString("D");
+		isSubmitting = false;
+		NavigationManager.NavigateTo("/dashboard");
+		return true;
+	}
 
-    protected sealed class TransactionForm
-    {
-        public string Description { get; set; } = string.Empty;
-        public decimal Amount { get; set; }
-        public string EntryType { get; set; } = "Credit";
-    }
+	private void ResetMfaStep()
+	{
+		isMfaStep = false;
+		errorMessage = null;
+		loginRequest.MfaCode = null;
+		loginRequest.ChallengeSession = null;
+		loginRequest.ChallengeName = null;
+	}
+
+	private async Task BeginOAuthSignInAsync()
+	{
+		isSubmitting = true;
+		errorMessage = null;
+
+		var state = await JsRuntime.InvokeAsync<string>("cashFlowAuthStorage.createOAuthState");
+		await JsRuntime.InvokeVoidAsync("cashFlowAuthStorage.saveOAuthState", state);
+		NavigationManager.NavigateTo(OAuthLoginService.BuildAuthorizeUrl(state), forceLoad: true);
+	}
 }

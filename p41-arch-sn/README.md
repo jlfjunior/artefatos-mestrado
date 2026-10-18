@@ -1,291 +1,181 @@
-# FluxoCaixa
+# controleDeLancamentos
 
-Sistema de controle de fluxo de caixa diário com lançamentos (débitos e créditos) e relatório consolidado diário, desenvolvido com arquitetura de microsserviços em .NET 10.
+Projeto desenvolvido para o desafio **desafio-arquiteto-software-out2024.pdf**, com foco em processamento de lançamentos financeiros (crédito e débito) e consulta de saldo diário consolidado com alta disponibilidade em leitura.
 
-![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet)
-![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql)
-![RabbitMQ](https://img.shields.io/badge/RabbitMQ-3-FF6600?logo=rabbitmq)
-![xUnit](https://img.shields.io/badge/Tests-xUnit-512BD4)
+## 1. Visão Geral do Projeto
 
----
+O **controleDeLancamentos** implementa dois fluxos de negócio principais:
 
-## Visão Geral da Arquitetura
+- **Escrita de lançamentos** (débito/crédito) via API REST.
+- **Leitura de consolidado diário** por data de referência.
 
-```
-                        ┌─────────────────┐
-                        │   Cliente HTTP  │
-                        └────────┬────────┘
-                                 │ JWT
-                        ┌────────▼────────┐
-                        │   API Gateway   │
-                        │     (YARP)      │
-                        │  (porta 8080)   │                        
-                        └──┬─────────┬────┘
-                           │         │
-             /api/entries  │         │  /api/consolidation
-                           │         │
-              ┌────────────▼──┐   ┌──▼─────────────────┐
-              │ Serviço de    │   │ Serviço de         │
-              │ Lançamentos   │   │ Consolidado Diário │
-              │ (porta 8081)  │   │ (porta 8082)       │
-              └──────┬────────┘   └────────────┬───────┘
-          Publicador │                         │ Consumidor
-                     │      ┌───────────┐      │
-                     └─────►│ RabbitMQ  │◄─────┘
-                            │ entry.    │
-                            │ created   │
-                            └───────────┘
-                     │                        │
-              ┌──────▼──────┐        ┌────────▼───────┐
-              │ PostgreSQL  │        │   PostgreSQL   │
-              │ db_entries  │        │db_consolidation│
-              └─────────────┘        └────────────────┘
-```
-> Para mais detalhes veja [docs/current-architecture.png](docs/current-architecture.png)
+O objetivo central é manter o endpoint de criação de lançamentos rápido e resiliente, mesmo sob carga, enquanto a consolidação diária ocorre de forma assíncrona e desacoplada.
 
-### Fluxo Principal
+## 2. Arquitetura e Padrões Adotados
 
-1. O cliente envia uma requisição autenticada com JWT para o API Gateway (YARP)
-2. O Gateway valida o token e roteia para o serviço correto
-3. O Serviço de Lançamentos persiste o lançamento e publica o evento `entry.created` no RabbitMQ
-4. O Serviço de Consolidado consome o evento de forma assíncrona e atualiza o saldo diário
-5. Cada serviço possui seu próprio banco PostgreSQL, sem banco compartilhado
+### Clean Architecture
 
-> O Serviço de Lançamentos continua operando normalmente mesmo que o Serviço de Consolidado esteja fora do ar, o RabbitMQ garante a entrega das mensagens quando o serviço voltar.
+O código segue separação em camadas:
 
----
+- **Domain**: entidades e regras de negócio puras (`Lancamento`, `ConsolidadoDiario`, regras de validação).
+- **Application**: casos de uso, contratos, DTOs e interfaces.
+- **Infrastructure**: EF Core, PostgreSQL, repositórios, event bus in-memory e worker em background.
+- **API**: controllers, autenticação JWT, documentação Swagger/OpenAPI.
 
-## Tecnologias Utilizadas
+Essa organização reduz acoplamento, facilita testes unitários e preserva a regra de dependência (camadas externas dependem das internas).
 
-| Tecnologia | Versão | Uso |
-|---|---|---|
-| .NET | 10.0 | Plataforma principal |
-| ASP.NET Core | 10.0 | APIs REST |
-| YARP | 2.3.0 | API Gateway |
-| Entity Framework Core | 10.0.8 | ORM |
-| PostgreSQL | 16 | Banco de dados |
-| Npgsql | 10.0.2 | Driver do PostgreSQL |
-| RabbitMQ | 3 | Broker de mensageria |
-| RabbitMQ.Client | 7.2.1 | Driver do RabbitMQ |
-| Docker | 4.75.0 | Containerização |
-| Docker Compose | 3.8 | Orquestração |
+### Princípios SOLID aplicados
 
----
+- **S (Single Responsibility)**: serviços focados por caso de uso (`CriarLancamentoService`, `CalcularConsolidadoDiarioService`).
+- **O (Open/Closed)**: contratos por interface permitem evolução sem alterar consumidores.
+- **L (Liskov)**: implementações de repositórios respeitam os contratos da Application.
+- **I (Interface Segregation)**: interfaces específicas para cada necessidade (ex.: escrita/leitura de consolidado).
+- **D (Dependency Inversion)**: Application depende de abstrações; Infrastructure fornece implementações via DI.
 
-## Estrutura do Projeto
+## 3. Estratégia de Resiliência e Desacoplamento
 
-```
-FluxoCaixa/
-│
-├── src/
-│   ├── Gateway/
-│   │   └── Gateway/                           ← API Gateway com YARP
-│   │
-│   └── Services/
-│       ├── Entries/                           ← Serviço de Lançamentos
-│       │   ├── Entries.API/                   ← Controllers, Program.cs, Swagger
-│       │   ├── Entries.Application/           ← Use Cases, DTOs, Interfaces
-│       │   ├── Entries.Domain/                ← Entidades, Value Objects, Eventos
-│       │   └── Entries.Infrastructure/        ← EF Core, Repositórios, RabbitMQ Publisher
-│       │
-│       └── Consolidation/                     ← Serviço de Consolidado Diário
-│           ├── Consolidation.API/             ← Controllers, Program.cs, Swagger
-│           ├── Consolidation.Application/     ← Use Cases, DTOs
-│           ├── Consolidation.Domain/          ← Entidades, Interfaces
-│           └── Consolidation.Infrastructure/  ← EF Core, Repositórios, RabbitMQ Consumer
-│
-├── tests/
-│   ├── Entries.Tests/                         ← Testes unitários do serviço de Lançamentos
-│   └── Consolidation.Tests/                   ← Testes unitários do serviço de Consolidado
-│
-├── docs/
-│   ├── architecture-decision-records.md       ← ADRs das decisões arquiteturais
-│   └── future-improvements.md                 ← Melhorias futuras planejadas
-│   └── current-architecture.png               ← Desenho atual da arquitetura
-│   └── future-architecture.png                ← Desenho de futuras implementações na arquitetura
-│
-├── docker-compose.yml
-├── FluxoCaixa.sln
-└── README.md
+Foi adotado um padrão **CQRS simplificado** com separação de modelo de escrita e leitura:
+
+- **Write model**: tabela `lancamentos`.
+- **Read model**: tabela `consolidados_diarios`.
+
+Fluxo implementado:
+
+1. `POST /api/lancamentos` persiste o lançamento na tabela `lancamentos`.
+2. Após persistir, publica `LancamentoCriadoEvent` em um **Event Bus in-memory** (`System.Threading.Channels`).
+3. Um `BackgroundService` consome o evento e executa upsert acumulado em `consolidados_diarios`.
+4. `GET /api/consolidado-diario` consulta diretamente o read-model pré-calculado.
+
+Com isso, a criação de lançamento fica **desacoplada** do cálculo de consolidado: se houver atraso, lock ou falha transitória na consolidação, o endpoint de lançamento continua disponível porque não depende do cálculo síncrono no mesmo request.
+
+No requisito de pico (50 RPS), a leitura em tabela pré-calculada evita `SUM` em tempo real sobre todos os lançamentos e reduz custo de consulta para acesso direto por data, sustentando throughput com baixa latência e sem perda de requisição HTTP no cenário do desafio.
+
+## 4. Desenho da Solução
+
+```text
+                    +----------------------------------+
+                    |        Cliente / Consumidor      |
+                    +----------------+-----------------+
+                                     |
+                                     v
+                      +--------------+---------------+
+                      |     API ASP.NET Core (.NET)  |
+                      |  /api/lancamentos (POST)     |
+                      |  /api/consolidado-diario GET |
+                      +------+-------------------+----+
+                             |                   |
+                 (write path)|                   |(read path)
+                             v                   v
+                 +-----------+----+      +-------+------------------+
+                 | Tabela: lancamentos|   | Tabela: consolidados_   |
+                 | (write model)      |   | diarios (read model)    |
+                 +-----------+--------+   +-------------------------+
+                             |
+                             | publica evento
+                             v
+                 +-----------+-------------------------------+
+                 | InMemory Event Bus (System.Threading.     |
+                 | Channels)                                 |
+                 +-----------+-------------------------------+
+                             |
+                             | consome evento
+                             v
+                 +-----------+-------------------------------+
+                 | BackgroundService: AtualizarConsolidado   |
+                 | upsert/acúmulo por data de referência     |
+                 +-------------------------------------------+
 ```
 
-### Padrão Arquitetural por Serviço (DDD Leve)
+## 5. Tecnologias Utilizadas
 
-```
-API → Application → Domain ← Infrastructure
-```
+- **.NET 10 / C#**
+- **ASP.NET Core Web API**
+- **Entity Framework Core 10**
+- **PostgreSQL 16**
+- **NUnit** (testes unitários)
+- **Swashbuckle / Swagger**
+- **Docker Compose**
+- **pgAdmin 4**
 
-- **Domain**: entidades, value objects, eventos de domínio, interfaces de repositório
-- **Application**: casos de uso (handlers), DTOs
-- **Infrastructure**: implementações concretas (EF Core, RabbitMQ)
-- **API**: controllers, injeção de dependência, configuração
+## 6. Como Executar o Projeto Localmente
 
----
+### Pré-requisitos
 
-## Pré-requisitos
+- Docker + Docker Compose
 
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) instalado e rodando
-- [Git](https://git-scm.com/) para clonar o repositório
+### Passo a passo
 
----
-
-## Como Rodar Localmente
-
-### 1. Clone o repositório
+1. Na raiz do projeto, suba os containers:
 
 ```bash
-git clone https://github.com/leonardoss0308/FluxoCaixa.git
-cd FluxoCaixa
+docker compose up --build
 ```
 
-### 2. Suba os containers
+2. Acesse os serviços:
 
-Com o Docker Desktop em execução, navegue até a pasta do projeto FluxoCaixa e execute o comando
+- **Swagger (API):** http://localhost:8080/swagger
+- **pgAdmin:** http://localhost:5050
+
+3. Credenciais e variáveis de ambiente:
+
+- O arquivo `.env` contém os valores de banco/JWT/pgAdmin usados no `docker-compose.yml`.
+- Em ambientes reais, use secret manager/variáveis seguras e não commite segredos.
+
+## 7. Autenticação (JWT)
+
+Os endpoints de negócio (`/api/lancamentos` e `/api/consolidado-diario`) estão protegidos com JWT Bearer.
+
+### Gerando token de teste via cURL
 
 ```bash
-docker-compose up --build
+curl -X POST "http://localhost:8080/api/autenticacao/token-teste" \
+  -H "Content-Type: application/json" \
+  -d "{\"usuario\":\"arquiteto-teste\"}"
 ```
 
-Aguarde todos os serviços subirem. Na primeira execução o Docker irá baixar as imagens necessárias.
+A resposta contém `accessToken` e `tokenType` (`Bearer`).
 
-### 3. Acesse os serviços
+### Chamando endpoint protegido com Bearer
 
-| Serviço | URL |
-|---|---|
-| API Gateway | http://localhost:8080 |
-| Swagger — Lançamentos | http://localhost:8081/swagger |
-| Swagger — Consolidado | http://localhost:8082/swagger |
-| RabbitMQ Management | http://localhost:15672 (guest/guest) |
-
-### 4. Gere um token JWT para testar
-
-Acesse [jwt.io](https://jwt.io), clique em JWT Encoder e configure:
-
-**Payload:**
-```json
-{
-  "sub": "test-user",
-  "iss": "FluxoCaixa",
-  "aud": "FluxoCaixa",
-  "exp": 9999999999
-}
+```bash
+curl -X POST "http://localhost:8080/api/lancamentos" \
+  -H "Authorization: Bearer SEU_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d "{\"valor\":150.75,\"tipo\":\"Credito\",\"dataLancamento\":\"2026-05-30T10:00:00\",\"descricao\":\"Recebimento\"}"
 ```
 
-**Signature secret:**
-```
-fluxo-caixa-secret-key-2026-super-secure
-```
-
-> Certifique-se de que a opção "secret base64 encoded" está desmarcada.
-
-Use o token gerado no botão Authorize do Swagger ou no header `Authorization: Bearer {token}` no Postman.
-
----
-
-## Endpoints da API
-
-### Serviço de Lançamentos
-
-| Método | Endpoint | Descrição |
-|---|---|---|
-| POST | `/api/entries` | Cria um novo lançamento |
-| GET | `/api/entries?date={date}` | Lista lançamentos por data |
-
-**POST /api/entries — Request:**
-```json
-{
-  "amount": 150.00,
-  "currency": "BRL",
-  "type": 2,
-  "description": "Venda de produto",
-  "date": "2024-01-15T00:00:00"
-}
+```bash
+curl "http://localhost:8080/api/consolidado-diario?dataReferencia=2026-05-30" \
+  -H "Authorization: Bearer SEU_TOKEN"
 ```
 
-> `type`: `1` = Débito, `2` = Crédito
+### Usando no Swagger UI
 
-**POST /api/entries — Response (201):**
-```json
-{
-  "id": "e691a91e-f733-4c8d-aebf-0393be64c67f",
-  "amount": 150.00,
-  "currency": "BRL",
-  "type": 2,
-  "description": "Venda de produto",
-  "date": "2024-01-15T00:00:00Z",
-  "createdAt": "2026-05-30T02:16:35Z"
-}
-```
+1. Gere o token em `POST /api/autenticacao/token-teste`.
+2. Clique em **Authorize** no topo do Swagger.
+3. Informe: `Bearer SEU_TOKEN`.
+4. Confirme em **Authorize** e execute os endpoints protegidos.
 
-**Moedas suportadas:** `BRL`, `USD`
+## 8. Como Rodar os Testes
 
----
-
-### Serviço de Consolidado Diário
-
-| Método | Endpoint | Descrição |
-|---|---|---|
-| GET | `/api/consolidation/{date}` | Saldo consolidado de um dia |
-| GET | `/api/consolidation/range?from={date}&to={date}` | Saldo consolidado por período |
-
-**GET /api/consolidation/2024-01-15 — Response (200):**
-```json
-{
-  "id": "a8c5b0e2-c883-4759-add4-25c04396d14c",
-  "date": "2024-01-15T00:00:00",
-  "totalCredits": 450.00,
-  "totalDebits": 80.00,
-  "balance": 370.00,
-  "currency": "BRL",
-  "updatedAt": "2026-05-30T02:19:00Z"
-}
-```
-
----
-
-## Como Rodar os Testes
-
-### Via terminal
+Para executar todos os testes NUnit:
 
 ```bash
 dotnet test
 ```
 
-### O que é testado
+Os testes cobrem regras de domínio de lançamentos e cenários de aplicação (criação/publicação de eventos e cálculo do consolidado diário).
 
-| Suite | Testes | Cobertura |
-|---|---|---|
-| `Entries.Tests` | 14 testes | Entidade `Entry`, Value Object `Money`, `CreateEntryHandler` |
-| `Consolidation.Tests` | 11 testes | Entidade `DailyBalance`, `ProcessEntryCreatedHandler` |
+## 9. Evoluções Futuras (Arquitetura Target)
 
----
+Para um ambiente produtivo de maior escala e múltiplas instâncias, a evolução natural é substituir o Event Bus in-memory por broker durável, por exemplo:
 
-## Decisões Arquiteturais
+- **RabbitMQ**
+- **Azure Service Bus**
+- **Kafta**
 
-As decisões foram tomadas considerando os requisitos não-funcionais do desafio, especialmente a independência entre os serviços e a capacidade de suportar picos de 50 req/s com no máximo 5% de perda.
+E complementar com padrões de confiabilidade operacional, como:
 
-| Decisão | Escolha | Motivo |
-|---|---|---|
-| Padrão arquitetural | Microsserviços | Isolamento de falhas entre serviços |
-| Comunicação | RabbitMQ (assíncrona) | Garante que lançamentos funcionem mesmo se o consolidado cair |
-| Banco de dados | PostgreSQL (um por serviço) | Isolamento total, sem ponto único de falha |
-| Arquitetura interna | DDD leve | Separação clara de responsabilidades |
-| Gateway | YARP | Centraliza autenticação JWT, nativo .NET |
-| Autenticação | JWT stateless | Escalável horizontalmente sem sessão |
-
-> Para detalhes completos veja [docs/architecture-decision-records.md](docs/architecture-decision-records.md)
-
----
-
-## Melhorias Futuras
-
-> Para descrição detalhada veja [docs/future-improvements.md](docs/future-improvements.md) junto com  diagrama [docs/future-architecture.png](docs/future-architecture.png)
-
-- **Redis** — cache do consolidado diário para suportar os picos de 50 req/s com menor latência
-- **Serilog + Seq** — observabilidade centralizada com logs estruturados
-- **Health Checks** — endpoints `/health` para monitoramento dos serviços
-- **Endpoint de Login** — geração de token JWT via API em vez de jwt.io
-- **Outbox Pattern** — garantia transacional na publicação de eventos no RabbitMQ
-- **Rate Limiting** — proteção contra abuso nos endpoints públicos
-- **Testes de Integração** — cobertura end-to-end com Testcontainers
+- **Outbox/Inbox** para consistência entre gravação e publicação.
+- **Retry com backoff** e **dead-letter queue**.
+- **Observabilidade** (métricas, tracing distribuído e alertas).

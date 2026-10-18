@@ -1,128 +1,51 @@
-version: '3.8'
-
 services:
-
-  db-entries:
-    image: postgres:16
-    container_name: db-entries
-    environment:
-      POSTGRES_DB: db_entries
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5432:5432"
-    volumes:
-      - db-entries-data:/var/lib/postgresql/data
-    networks:
-      - fluxo-caixa-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  db-consolidation:
-    image: postgres:16
-    container_name: db-consolidation
-    environment:
-      POSTGRES_DB: db_consolidation
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5433:5432"
-    volumes:
-      - db-consolidation-data:/var/lib/postgresql/data
-    networks:
-      - fluxo-caixa-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  rabbitmq:
-    image: rabbitmq:3-management
-    container_name: rabbitmq
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
-    networks:
-      - fluxo-caixa-network
-    healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  entries-api:
+  api:
     build:
       context: .
-      dockerfile: src/Services/Entries/Entries.API/Dockerfile
-    container_name: entries-api
-    ports:
-      - "8081:8080"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=db-entries;Port=5432;Database=db_entries;Username=postgres;Password=postgres
-      - RabbitMq__HostName=rabbitmq
-      - Jwt__Issuer=FluxoCaixa
-      - Jwt__Audience=FluxoCaixa
-      - Jwt__Secret=fluxo-caixa-secret-key-2026-super-secure
-    depends_on:
-      db-entries:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
-    networks:
-      - fluxo-caixa-network
-
-  consolidation-api:
-    build:
-      context: .
-      dockerfile: src/Services/Consolidation/Consolidation.API/Dockerfile
-    container_name: consolidation-api
-    ports:
-      - "8082:8080"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=db-consolidation;Port=5432;Database=db_consolidation;Username=postgres;Password=postgres
-      - RabbitMq__HostName=rabbitmq
-      - Jwt__Issuer=FluxoCaixa
-      - Jwt__Audience=FluxoCaixa
-      - Jwt__Secret=fluxo-caixa-secret-key-2026-super-secure
-    depends_on:
-      db-consolidation:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
-    networks:
-      - fluxo-caixa-network
-
-  gateway:
-    build:
-      context: .
-      dockerfile: src/Gateway/Gateway/Dockerfile
-    container_name: gateway
+      dockerfile: src/ControleLancamentos.Api/Dockerfile
     ports:
       - "8080:8080"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - Jwt__Issuer=FluxoCaixa
-      - Jwt__Audience=FluxoCaixa
-      - Jwt__Secret=fluxo-caixa-secret-key-2026-super-secure
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__ControleLancamentos: Host=db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      Jwt__Issuer: ${JWT__Issuer}
+      Jwt__Audience: ${JWT__Audience}
+      Jwt__Secret: ${JWT__Secret}
+      Jwt__ExpiracaoMinutos: ${JWT__ExpiracaoMinutos}
     depends_on:
-      - entries-api
-      - consolidation-api
-    networks:
-      - fluxo-caixa-network
+      db:
+        condition: service_healthy
 
-networks:
-  fluxo-caixa-network:
-    driver: bridge
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      PGADMIN_LISTEN_PORT: 80
+    ports:
+      - "5050:80"
 
 volumes:
-  db-entries-data:
-  db-consolidation-data:
+  postgres_data:

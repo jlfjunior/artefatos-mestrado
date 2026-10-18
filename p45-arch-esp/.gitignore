@@ -1,43 +1,23 @@
-# Build results
-[Dd]ebug/
-[Rr]elease/
-[Bb]in/
-[Oo]bj/
-[Ll]og/
-[Ll]ogs/
+# Build outputs
+**/bin/
+**/obj/
+BenchmarkDotNet.Artifacts/
 
-# Visual Studio / Rider
+# Local / IDE
 .vs/
-.idea/
+*.slnLaunch.user
+aspire.config.json
 *.user
-*.suo
-*.userosscache
-*.sln.docstates
 
-# NuGet
-*.nupkg
-**/packages/*
-!**/packages/build/
-project.lock.json
-project.fragment.lock.json
-artifacts/
+# Load test and benchmark reports
+scripts/reports/
+reports/
 
-# Test
-TestResults/
-coverage/
-coverage-out/
-*.trx
-*.coverage
-*.coveragexml
+# Generated infra (local dev)
+infra/**/generated/
+infra/**/.cognito/
+infra/generated/
 
 # OS
-.DS_Store
 Thumbs.db
-
-# Environment
-.env
-.env.*
-!.env.example
-
-# Docker
-docker-compose.override.yml
+.DS_Store

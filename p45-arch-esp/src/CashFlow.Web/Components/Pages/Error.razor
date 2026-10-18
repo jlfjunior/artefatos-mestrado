@@ -1,5 +1,4 @@
 ﻿@page "/Error"
-@namespace CashFlow.Web.Components.Pages
 @using System.Diagnostics
 
 <PageTitle>Error</PageTitle>
@@ -25,12 +24,12 @@
     and restarting the app.
 </p>
 
-@code {
+@code{
     [CascadingParameter]
-    protected HttpContext? HttpContext { get; set; }
+    private HttpContext? HttpContext { get; set; }
 
-    protected string? RequestId { get; set; }
-    protected bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
+    private string? RequestId { get; set; }
+    private bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
 
     protected override void OnInitialized() =>
         RequestId = Activity.Current?.Id ?? HttpContext?.TraceIdentifier;

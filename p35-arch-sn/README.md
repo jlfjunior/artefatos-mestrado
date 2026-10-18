@@ -1,120 +1,203 @@
-# Ecossistema Financeiro: Gestão de Lançamentos e Saldos
+# Fluxo de Caixa — Carrefour Banco
 
-Este projeto implementa uma arquitetura de microsserviços voltada para alta disponibilidade e consistência eventual. O foco principal é demonstrar padrões modernos de desenvolvimento para sistemas financeiros, como **Transactional Outbox**, **Event-Driven Architecture** e **Cache-Aside**.
+Sistema de controle de fluxo de caixa desenvolvido como desafio técnico. Implementa uma arquitetura de microsserviços com comunicação assíncrona via mensageria, garantindo que o serviço de lançamentos permaneça disponível mesmo quando o serviço de consolidado estiver temporariamente indisponível.
 
----
+## Stack
 
-## 🏗 Arquitetura do Sistema (C4 Model)
-
-O diagrama abaixo descreve o fluxo de dados desde a entrada do lançamento até a consolidação do saldo, destacando o papel estratégico do RabbitMQ e do Redis.
-
-```mermaid
-graph TD
-    User((Usuário))
-    IDP[Keycloak / OIDC]
-    
-    subgraph "Contexto de Lançamentos"
-        API_L[Lancamentos.API]
-        DB_L[(PostgreSQL)]
-    end
-    
-    subgraph "Mensageria"
-        Broker[RabbitMQ / MassTransit]
-    end
-    
-    subgraph "Contexto de Consolidação"
-        API_C[Consolidado.API]
-        DB_C[(PostgreSQL)]
-        Cache[(Redis)]
-    end
-
-    User -- "1. Obtém Token" --> IDP
-    IDP -- "JWT" --> User
-    
-    User -- "2. POST /api/lancamentos (Auth: JWT)" --> API_L
-    API_L -- "3. Valida Token" --> IDP
-    
-    API_L -- "4. Persiste no DB + Outbox" --> DB_L
-    API_L -- "5. Publica Mensagem" --> Broker
-    
-    Broker -- "6. Notifica Evento" --> API_C
-    API_C -- "7. Atualiza DB e Cache" --> DB_C
-    API_C -- "8. Invalida/Update" --> Cache
-    
-    User -- "9. GET /api/consolidado/saldo (Auth: JWT)" --> API_C
-    API_C -- "10. Valida Token" --> IDP
-    API_C -- "11. Consulta Rápida" --> Cache
-```
+| Camada | Tecnologia |
+|---|---|
+| Backend | .NET 9 / C# |
+| Arquitetura | Clean Architecture · DDD · CQRS (MediatR) · Microsserviços |
+| Mensageria | MassTransit + RabbitMQ |
+| Cache | Redis (TTL 60s) |
+| Banco de Dados | SQL Server (EF Core 9 · Code First Migrations) |
+| API Gateway | YARP (Yet Another Reverse Proxy) |
+| Frontend | Angular 18 (Standalone Components) |
+| Testes | xUnit · FluentAssertions · Moq (38 testes) |
+| Infraestrutura | Docker + Docker Compose |
+| Resiliência | Polly (Retry com backoff exponencial) · Health Checks |
+| Segurança | JWT Bearer · Rate Limiting (sliding window) |
+| Observabilidade | Serilog (structured logging) |
 
 ---
 
-## 🛠 Tecnologias e Padrões
+## Pré-requisitos
 
-O ecossistema foi construído utilizando as seguintes tecnologias:
-
-- **Back-end**: .NET 10.0 (C#) com Clean Architecture.
-- **Mensageria**: RabbitMQ com MassTransit (garantia de entrega e retentativas).
-- **Armazenamento**: PostgreSQL (Dados transacionais) e Redis (Performance de leitura).
-- **Segurança**: Keycloak para gerenciamento de identidade e autenticação JWT.
-- **Observabilidade**: OpenTelemetry integrado ao Jaeger (Traces) e Prometheus (Métricas).
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- [Node.js 18+](https://nodejs.org/) (para o frontend)
+- [k6](https://k6.io/docs/get-started/installation/) (opcional, para teste de carga)
 
 ---
 
-## 🚀 Guia de Execução
+## Como Executar
 
-Para subir o ambiente completo (infraestrutura e aplicações), utilize o Docker:
+### Opção 1 — Docker Compose (recomendado)
+
+Sobe todos os microsserviços, banco, mensageria e cache com um único comando:
 
 ```bash
-docker compose up -d --build
+docker compose up --build -d
 ```
 
-### Endpoints de Referência:
-- **API Lançamentos**: [http://localhost:5000/scalar/v1](http://localhost:5000/scalar/v1)
-- **API Consolidado**: [http://localhost:5001/scalar/v1](http://localhost:5001/scalar/v1)
-- **Painel Jaeger**: [http://localhost:16686](http://localhost:16686)
-- **Painel Keycloak**: [http://localhost:8081](http://localhost:8081) (Credenciais: `admin`/`admin`)
+Em seguida, inicie o frontend:
+
+```bash
+cd frontend/fluxo-caixa-web
+npm install
+npm start
+```
+
+### Opção 2 — Execução local (.NET CLI)
+
+```bash
+# Terminal 1 — Infraestrutura
+docker compose up -d sqlserver rabbitmq redis
+
+# Terminal 2 — API de Lançamentos (porta 5001)
+cd src/Services/FluxoCaixa.Lancamentos.Api
+dotnet run
+
+# Terminal 3 — API do Consolidado (porta 5002)
+cd src/Services/FluxoCaixa.Consolidado.Api
+dotnet run
+
+# Terminal 4 — API Gateway (porta 5000)
+cd src/Gateway/FluxoCaixa.Gateway
+dotnet run
+
+# Terminal 5 — Frontend
+cd frontend/fluxo-caixa-web
+npm install
+npm start
+```
+
+> As migrations são aplicadas automaticamente na inicialização de cada serviço.
 
 ---
 
-## 🔐 Procedimento de Teste
+## URLs de Acesso
 
-Siga os passos abaixo para validar o fluxo entre os serviços:
+| Recurso | URL |
+|---|---|
+| Frontend | http://localhost:4200 |
+| Gateway (entry point da API) | http://localhost:5000 |
+| Swagger — Lançamentos | http://localhost:5001/swagger |
+| Swagger — Consolidado | http://localhost:5002/swagger |
+| RabbitMQ Management | http://localhost:15672 (guest / guest) |
 
-### 1. Obtenção de Token
-Acesse a **Lancamentos.API** e utilize o endpoint `POST /api/Auth/token` com as credenciais:
-- **User**: `admin` | **Pass**: `admin`
-- Copie o `access_token` retornado.
+---
 
-### 2. Autenticação
-No Scalar (Swagger), clique no botão **Authorize** e insira o token obtido. Repita este processo para a **Consolidado.API**.
+## Autenticação
 
-### 3. Registro de Lançamento
-Envie um novo lançamento via `POST /api/Lancamentos`:
+Todos os endpoints exigem autenticação JWT. Para obter um token:
+
+```bash
+curl -X POST http://localhost:5000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{ "email": "comerciante@teste.com", "senha": "Senha@123" }'
+```
+
+> **Nota:** as credenciais são fixas para este desafio técnico. Em produção, a autenticação utilizaria um provedor de identidade (Keycloak, Azure AD B2C ou similar).
+
+Use o token retornado no header de todas as requisições:
+
+```
+Authorization: Bearer <token>
+```
+
+---
+
+## Contratos de API
+
+### Lançamentos
+
+| Método | Endpoint | Descrição |
+|---|---|---|
+| `POST` | `/api/lancamentos` | Registra um novo lançamento |
+| `GET` | `/api/lancamentos?data=yyyy-MM-dd` | Lista lançamentos do dia |
+
+**Payload de criação:**
 ```json
 {
-  "valor": 1250.50,
-  "tipo": "credito"
+  "descricao": "Venda balcão",
+  "valor": 150.00,
+  "tipo": "CREDITO",
+  "dataHora": "2026-03-30T13:00:00Z"
 }
 ```
 
-### 4. Validação de Saldo
-Acesse a **Consolidado.API** e execute o `GET /api/Consolidado/saldo`. O valor acumulado refletirá o lançamento processado de forma assíncrona.
+### Consolidado
+
+| Método | Endpoint | Descrição |
+|---|---|---|
+| `GET` | `/api/consolidado/{data}` | Saldo consolidado de um dia |
+| `GET` | `/api/consolidado/range?inicio=&fim=` | Saldo consolidado de um período |
 
 ---
 
-## 🧪 Resiliência e Falhas (Simulação)
+## Testes
 
-Para validar o funcionamento do **Transactional Outbox**:
-1. Interrompa o serviço de mensageria: `docker compose stop rabbitmq`.
-2. Realize lançamentos via API. Note que a API responderá com sucesso, salvando os dados localmente.
-3. Reinicie o serviço: `docker compose start rabbitmq`.
-4. Observe no Jaeger (ou via consulta de saldo) que as mensagens "presas" no banco de dados foram processadas e o saldo foi sincronizado automaticamente.
+### Testes Unitários (38 testes · 100% aprovados)
 
----
-
-## 📊 Qualidade de Código
-O projeto está configurado para análise contínua no SonarQube. Para disparar um scan manual:
-```powershell
-.\run-scan.ps1
+```bash
+dotnet test
 ```
-Acompanhe os resultados em: [http://localhost:9000](http://localhost:9000).
+
+| Projeto | Testes |
+|---|---|
+| `FluxoCaixa.Lancamentos.Tests` | 21 — domínio + command handlers + query handlers |
+| `FluxoCaixa.Consolidado.Tests` | 17 — domínio + query handlers + event consumer |
+
+### Teste de Carga (k6)
+
+Valida o requisito de 50 req/s com menos de 5% de erros no serviço de consolidado.
+
+```bash
+k6 run ./k6/consolidado_pico.js
+```
+
+| Métrica | Meta |
+|---|---|
+| Taxa de erros | < 5% |
+| Latência p95 | < 200ms |
+| Latência p99 | < 500ms |
+| Throughput mínimo | ≥ 47,5 req/s |
+
+---
+
+## Estrutura do Projeto
+
+```
+/FluxoCaixa
+├── src/
+│   ├── Services/
+│   │   ├── FluxoCaixa.Lancamentos.*/     ← Microsserviço 1 (Domain/Application/Infrastructure/Api)
+│   │   └── FluxoCaixa.Consolidado.*/     ← Microsserviço 2 (Domain/Application/Infrastructure/Api)
+│   └── Gateway/
+│       └── FluxoCaixa.Gateway/           ← YARP Gateway (JWT, CORS, Rate Limiting, Auth)
+├── frontend/
+│   └── fluxo-caixa-web/                  ← Angular 18 SPA
+├── tests/
+│   ├── FluxoCaixa.Lancamentos.Tests/     ← 21 testes unitários
+│   └── FluxoCaixa.Consolidado.Tests/     ← 17 testes unitários
+├── k6/
+│   └── consolidado_pico.js               ← Teste de carga (50 req/s)
+├── docker-compose.yml
+├── arquitetura_fluxo_caixa.md            ← Documentação técnica completa
+└── README.md
+```
+
+---
+
+## Decisões Arquiteturais
+
+Consulte [`README_arquitetura_fluxo_caixa.md`](./README_arquitetura_fluxo_caixa.md) para a documentação técnica completa, incluindo:
+
+- Justificativa da separação em microsserviços com mensageria assíncrona
+- Decisões sobre CQRS, DDD e Clean Architecture
+- Diagrama de componentes e fluxo de eventos
+- Estratégia de resiliência (Polly, Health Checks, idempotência via `ProcessedEvent`)
+- Tratamento de race condition com `MERGE SQL + HOLDLOCK` para consistência do consolidado
+- Estratégia de cache Redis com invalidação orientada a evento
+- Plano de testes (unitários, integração, carga, E2E)
+- Melhorias futuras (Outbox Pattern, OpenTelemetry, Kubernetes HPA)
